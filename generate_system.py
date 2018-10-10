@@ -18,7 +18,10 @@ import sys
 NUM_STARS = [(1,10), (2,9), (3,3), (4,1)]
 NUM_PLANETS = [(4,10), (5,10), (6,10), (7,9), (8,9), (9,9), (10,8), (11,8), (12,8), (13,7), (14,7), (15,6)]
 STAR_TYPES = [('Brown Dwarf Star',2), ('Red Dwarf Star', 20), ('Main Sequence Average Mass Star', 8), ('Main Sequence High Mass Star', 8), ('Giant Star', 4), ('Supergiant Star', 3), ('Hypergiant Star', 2), ('Neutron Star', 1)]
-PLANET_TYPES = [('Gas Giant Planet', 4), ('Terrestrial Planet', 4), ('Dwarf Planet', 5)]
+PLANET_TYPES = [('Gas Giant', 4), ('Terrestrial', 4), ('Dwarf', 5)]
+
+PLANET_AVERAGE_MASSES = {'Gas Giant':1e26, 'Terrestrial':5e23, 'Dwarf':1e21}
+PLANET_AVERAGE_NUM_MOONS = {'Gas Giant':20, 'Terrestrial':2, 'Dwarf': 0.78}
 
 # ======== Functions ========
 def generate_value_from_list(list):
@@ -37,6 +40,18 @@ def generate_value_from_list(list):
         if val < total_running:
             return l[0]
 
+def generate_planet_details(p):
+    planet = {}
+    exponent = np.random.normal(0,0.6)
+    planet['mass'] = PLANET_AVERAGE_MASSES[p] * pow(10,exponent)
+    
+    avg = PLANET_AVERAGE_NUM_MOONS[p]
+    planet['nummoons'] = abs(floor(np.random.normal(avg,avg/2)))
+    if p == 'Gas Giant':
+        planet['nummoons'] += PLANET_AVERAGE_NUM_MOONS[p]
+    
+    return planet 
+
 def system_type(num_stars):
     if num_stars == 1:
         return 'Single Star'
@@ -49,23 +64,18 @@ def system_type(num_stars):
     
 # ======== Main =============
 def main():
-    print('======== Stars ========')
     num_stars = generate_value_from_list(NUM_STARS)
-    print('Number of Stars: ', num_stars)
+    print('========',str(num_stars), 'Stars ========')
     for star in range(0, num_stars):
         print(generate_value_from_list(STAR_TYPES))
     
-    print('======== Planets ========')
     num_planets = generate_value_from_list(NUM_PLANETS)
-    print('Number of Planets: ', num_planets)
-    for planet in range(0, num_planets):
-        print(generate_value_from_list(PLANET_TYPES))
-    
-    '''
-    fig,ax = plt.subplots()
-    ax.hist(num_stars)
-    plt.show()
-    '''
+    print('========', num_planets,'Planets ========')
+    for p in range(0, num_planets):
+        planet = generate_value_from_list(PLANET_TYPES)
+        print(planet)
+        details = generate_planet_details(planet)
+        print('  ', details)
     
 if __name__ == '__main__':
     main()
