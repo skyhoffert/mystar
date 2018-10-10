@@ -23,6 +23,7 @@ def postamble(num):
 
 def log(t):
     print('[ LOG ]', t)
+    sys.stdout.flush()
 
 def main():
     print()
@@ -36,54 +37,63 @@ def main():
     testnum += 1
     
     preamble(testnum, 'Authentication for known user')
-    payload = json.loads('{"username":"sky", "password":"earthisacoolplanet"}')
-    resp = requests.post('http://localhost:5000/verify', json=payload)
+    payload = pickle.dumps(json.loads('{"username":"sky", "password":"earthisacoolplanet"}'))
+    resp = requests.post('http://localhost:5000/verify', data=payload)
     log(resp.text)
     assert('!' in resp.text)
     postamble(testnum)
     testnum += 1
     
     preamble(testnum, 'Authentication for incorrect username')
-    payload = json.loads('{"username":"skyguy", "password":"earthisacoolplanet"}')
-    resp = requests.post('http://localhost:5000/verify', json=payload)
+    payload = pickle.dumps(json.loads('{"username":"skyguy", "password":"earthisacoolplanet"}'))
+    resp = requests.post('http://localhost:5000/verify', data=payload)
     log(resp.text)
     assert('!' not in resp.text)
     postamble(testnum)
     testnum += 1
     
     preamble(testnum, 'Authentication for incorrect password')
-    payload = json.loads('{"username":"sky", "password":"marsisacoolplanet"}')
-    resp = requests.post('http://localhost:5000/verify', json=payload)
+    payload = pickle.dumps(json.loads('{"username":"sky", "password":"marsisacoolplanet"}'))
+    resp = requests.post('http://localhost:5000/verify', data=payload)
     log(resp.text)
     assert('!' not in resp.text)
     postamble(testnum)
     testnum += 1
     
     preamble(testnum, 'Attempt test that passwords with commas in them are okay')
-    payload = json.loads('{"username":"sky2", "password":"password,withacommainit"}')
-    resp = requests.post('http://localhost:5000/verify', json=payload)
+    payload = pickle.dumps(json.loads('{"username":"sky2", "password":"password,withacommainit"}'))
+    resp = requests.post('http://localhost:5000/verify', data=payload)
     log(resp.text)
     assert('!' in resp.text)
     postamble(testnum)
     testnum += 1
     
     preamble(testnum, 'Attempt to add/modify an existing user')
-    payload = json.loads('{"username":"admin", "password":"europa!m=5e22r=2e3y=1610", "new_user":{"username":"newsky","password":"NewSuperCoolPassword"}}')
-    resp = requests.post('http://localhost:5000/add_user', json=payload)
+    payload = pickle.dumps(json.loads('{"username":"admin", "password":"europa!m=5e22r=2e3y=1610", "new_user":{"username":"newsky","password":"NewSuperCoolPassword"}}'))
+    resp = requests.post('http://localhost:5000/add_user', data=payload)
     log(resp.text)
     assert('!' in resp.text)
-    payload = json.loads('{"username":"newsky", "password":"NewSuperCoolPassword"}')
-    resp = requests.post('http://localhost:5000/verify', json=payload)
+    payload = pickle.dumps(json.loads('{"username":"newsky", "password":"NewSuperCoolPassword"}'))
+    resp = requests.post('http://localhost:5000/verify', data=payload)
     log(resp.text)
     assert('!' in resp.text)
     postamble(testnum)
     testnum += 1
     
+    preamble(testnum, 'Attempt to fetch non-existant system')
+    payload = pickle.dumps(json.loads('{"username":"n/a", "type":"get"}'))
+    resp = requests.post('http://localhost:5000/system', data=payload)
+    log(resp.text)
+    assert('!' not in resp.text)
+    postamble(testnum)
+    testnum += 1
+    
     preamble(testnum, 'Pull down a known system')
-    payload = json.loads('{"username":"sky", "type":"get"}')
-    resp = requests.post('http://localhost:5000/system', json=payload)
-    log(json.loads(resp.text))
-    assert('!' in resp.text)
+    payload = pickle.dumps(json.loads('{"username":"sky", "type":"get"}'))
+    resp = requests.post('http://localhost:5000/system', data=payload)
+    resp_obj = json.loads(resp.json())
+    log(resp_obj['name'])
+    assert('Solar System' == resp_obj['name'])
     postamble(testnum)
     testnum += 1
     
