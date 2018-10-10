@@ -29,7 +29,7 @@ def main():
     testnum = 0
     
     preamble(testnum, 'GET request on main page')
-    resp = requests.get('http://localhost:5000/stars')
+    resp = requests.get('http://localhost:5000/')
     log(resp.text)
     assert('!' in resp.text)
     postamble(testnum)
@@ -75,6 +75,14 @@ def main():
     payload = json.loads('{"username":"newsky", "password":"NewSuperCoolPassword"}')
     resp = requests.post('http://localhost:5000/verify', json=payload)
     log(resp.text)
+    assert('!' in resp.text)
+    postamble(testnum)
+    testnum += 1
+    
+    preamble(testnum, 'Pull down a known system')
+    payload = json.loads('{"username":"sky", "type":"get"}')
+    resp = requests.post('http://localhost:5000/system', json=payload)
+    log(json.loads(resp.text))
     assert('!' in resp.text)
     postamble(testnum)
     testnum += 1
