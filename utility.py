@@ -7,8 +7,11 @@ __maintainer__ = 'Sky Hoffert'
 __email__ = 'skyhoffert@gmail.com'
 __status__ = 'Development'
 
+import json
+import sys
+
 def does_user_exist(username, password):
-    f = open('users', 'r')
+    f = open('users.log', 'r')
     
     for line in f.readlines():
         tokens = line.split(',', 1)
@@ -21,7 +24,7 @@ def does_user_exist(username, password):
     return 'User not found.'
     
 def add_new_user(username, password):
-    f_in = open('users', 'r')
+    f_in = open('users.log', 'r')
     lines = []
     
     for line in f_in.readlines():
@@ -31,7 +34,7 @@ def add_new_user(username, password):
             
     f_in.close()
     
-    f_out = open('users', 'w')
+    f_out = open('users.log', 'w')
     
     for line in lines:
         f_out.write(line)
@@ -43,7 +46,15 @@ def add_new_user(username, password):
     
     return 'Success!'
     
-
+def get_user_system(username):
+    f = open('systems/{}.starsystem'.format(username), 'r')
+    full = ''
+    
+    for line in f.readlines():
+        full += line
+    
+    return full
+    
 
 
 

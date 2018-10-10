@@ -1,0 +1,23 @@
+{
+    "discoveredby": "sky",
+    "datediscovered": "October 10, 2018",
+    "name": "Solar System",
+    "stars": [
+        {
+            "name": "Sun",
+            "type": "G2V",
+            "radius": 696e6,
+            "mass": 1.9885e30,
+            "surfacetemp": 5772,
+            "age": 4.6e9
+        }
+    ],
+    "planets": [
+        {
+            "name": "Mercury"
+        },
+        {
+            "name": "Venus"
+        }
+    ]
+}

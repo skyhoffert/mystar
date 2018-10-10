@@ -49,6 +49,15 @@ def add_user():
         return did_add
     
     return 'Successfully added new user!'
+   
+@app.route('/system', methods=['POST'])
+def system():
+    payload = request.json
     
+    if payload['type'] == 'get':
+        return get_user_system(payload['username'])
+
 if __name__ == '__main__':
     app.run()
+
+
