@@ -19,3 +19,31 @@ def does_user_exist(username, password):
                 return 'Incorrect password.'
     
     return 'User not found.'
+    
+def add_new_user(username, password):
+    f_in = open('users', 'r')
+    lines = []
+    
+    for line in f_in.readlines():
+        tokens = line.split(',', 1)
+        if username != tokens[0]:
+            lines.append(line)
+            
+    f_in.close()
+    
+    f_out = open('users', 'w')
+    
+    for line in lines:
+        f_out.write(line)
+    
+    f_out.write(username)
+    f_out.write(',')
+    f_out.write(password)
+    f_out.write('\n')
+    
+    return 'Success!'
+    
+
+
+
+

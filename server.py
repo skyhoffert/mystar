@@ -9,6 +9,7 @@ __status__ = 'Development'
 
 import json
 from flask import Flask, request
+import pickle
 from utility import *
 
 app = Flask(__name__)
@@ -24,7 +25,7 @@ def stars():
     
 @app.route('/verify', methods=['POST'])
 def verify():
-    payload = json.loads(request.json)
+    payload = request.json
     
     did_auth = does_user_exist(payload['username'], payload['password'])
     if did_auth != 'Success!':
@@ -34,7 +35,7 @@ def verify():
     
 @app.route('/add_user', methods=['POST'])
 def add_user():
-    payload = json.loads(request.json)
+    payload = request.json
     
     if payload['username'] != 'admin':
         return 'Elevated priveliges required to add new user.'
@@ -42,6 +43,10 @@ def add_user():
     did_auth = does_user_exist(payload['username'], payload['password'])
     if did_auth != 'Success!':
         return did_auth
+    
+    did_add = add_new_user(payload['new_user']['username'], payload['new_user']['password'])
+    if did_add != 'Success!':
+        return did_add
     
     return 'Successfully added new user!'
     
