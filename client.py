@@ -7,6 +7,8 @@ __maintainer__ = 'Sky Hoffert'
 __email__ = 'skyhoffert@gmail.com'
 __status__ = 'Development'
 
+import json
+import pickle
 import requests
 import sys
 
@@ -34,7 +36,7 @@ def main():
     testnum += 1
     
     preamble(testnum, 'Authentication for known user')
-    payload = '{"username":"sky", "password":"earthisacoolplanet"}'
+    payload = json.loads('{"username":"sky", "password":"earthisacoolplanet"}')
     resp = requests.post('http://localhost:5000/verify', json=payload)
     log(resp.text)
     assert('!' in resp.text)
@@ -42,7 +44,7 @@ def main():
     testnum += 1
     
     preamble(testnum, 'Authentication for incorrect username')
-    payload = '{"username":"skyguy", "password":"earthisacoolplanet"}'
+    payload = json.loads('{"username":"skyguy", "password":"earthisacoolplanet"}')
     resp = requests.post('http://localhost:5000/verify', json=payload)
     log(resp.text)
     assert('!' not in resp.text)
@@ -50,7 +52,7 @@ def main():
     testnum += 1
     
     preamble(testnum, 'Authentication for incorrect password')
-    payload = '{"username":"sky", "password":"marsisacoolplanet"}'
+    payload = json.loads('{"username":"sky", "password":"marsisacoolplanet"}')
     resp = requests.post('http://localhost:5000/verify', json=payload)
     log(resp.text)
     assert('!' not in resp.text)
@@ -58,7 +60,7 @@ def main():
     testnum += 1
     
     preamble(testnum, 'Attempt test that passwords with commas in them are okay')
-    payload = '{"username":"sky2", "password":"password,withacommainit"}'
+    payload = json.loads('{"username":"sky2", "password":"password,withacommainit"}')
     resp = requests.post('http://localhost:5000/verify', json=payload)
     log(resp.text)
     assert('!' in resp.text)
@@ -66,8 +68,12 @@ def main():
     testnum += 1
     
     preamble(testnum, 'Attempt to add/modify an existing user')
-    payload = '{"username":"admin", "password":"europa!m=5e22r=2e3y=1610"}'
+    payload = json.loads('{"username":"admin", "password":"europa!m=5e22r=2e3y=1610", "new_user":{"username":"newsky","password":"NewSuperCoolPassword"}}')
     resp = requests.post('http://localhost:5000/add_user', json=payload)
+    log(resp.text)
+    assert('!' in resp.text)
+    payload = json.loads('{"username":"newsky", "password":"NewSuperCoolPassword"}')
+    resp = requests.post('http://localhost:5000/verify', json=payload)
     log(resp.text)
     assert('!' in resp.text)
     postamble(testnum)
