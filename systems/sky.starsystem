@@ -2,22 +2,125 @@
     "discoveredby": "sky",
     "datediscovered": "October 10, 2018",
     "name": "Solar System",
+    "age": 4.6e9,
     "stars": [
         {
-            "name": "Sun",
+            "name": "Sun (Sol)",
             "type": "G2V",
             "radius": 696e6,
             "mass": 1.9885e30,
-            "surfacetemp": 5772,
-            "age": 4.6e9
+            "surfacetemp": 5772
         }
     ],
     "planets": [
         {
-            "name": "Mercury"
+            "name": "Mercury",
+            "type": "Terrestrial",
+            "radius": 2440e3,
+            "mass": 3.3011e23,
+            "semi-major-axis": 57.91e9,
+            "eccentricity": 0.2056,
+            "inclination": 7.005,
+            "rotationperiod": 5067014,
+            "axialtilt": 0.034,
+            "albedo": 0.142,
+            "surfacepressure": 0,
+            "minsurfacetemp": 80,
+            "maxsurfacetemp": 700,
+            "colors": ["gray"],
+            "moons": [
+            ]
         },
         {
-            "name": "Venus"
+            "name": "Venus",
+            "type": "Terrestrial",
+            "radius": 6051e3,
+            "mass": 4.8675e24,
+            "semi-major-axis": 108.208e9,
+            "eccentricity": 0.006772,
+            "inclination": 3.86,
+            "rotationperiod": -20997360,
+            "axialtilt": 177.36,
+            "albedo": 0.689,
+            "surfacepressure": 9200,
+            "minsurfacetemp": 737,
+            "maxsurfacetemp": 737,
+            "colors": ["brown", "yellow", "white", "red"],
+            "moons": [
+            ]
+        },
+        {
+            "name": "Earth",
+            "type": "Terrestrial",
+            "radius": 6371e3,
+            "mass": 5.972e24,
+            "semi-major-axis": 149.598e9,
+            "eccentricity": 0.0167,
+            "inclination": 7.155,
+            "rotationperiod": 86400,
+            "axialtilt": 23.439,
+            "albedo": 0.367,
+            "surfacepressure": 101.325,
+            "minsurfacetemp": 184,
+            "maxsurfacetemp": 330,
+            "colors": ["blue", "white", "green", "yellow", "brown"],
+            "moons": [
+                {
+                    "name": "Luna",
+                    "radius": 1737e3,
+                    "mass": 7.342e22,
+                    "semi-major-axis": 384399e3,
+                    "eccentricity": 0.0549,
+                    "inclination": 5.145,
+                    "rotationperiod": 2360534,
+                    "axialtilt": 24,
+                    "albedo": 0.136,
+                    "surfacepressure": 0,
+                    "minsurfacetemp": 100,
+                    "maxsurfacetemp": 390,
+                    "colors": ["gray", "white"]
+                }
+            ]
+        },
+        {
+            "name": "Mars",
+            "type": "Terrestrial"
+        },
+        {
+            "name": "Jupiter",
+            "type": "Gas Giant"
+        },
+        {
+            "name": "Saturn",
+            "type": "Gas Giant"
+        },
+        {
+            "name": "Uranus",
+            "type": "Gas Giant"
+        },
+        {
+            "name": "Neptune",
+            "type": "Gas Giant"
+        },
+        {
+            "name": "Ceres",
+            "type": "Dwarf"
+        },
+        {
+            "name": "Pluto",
+            "type": "Dwarf"
+        },
+        {
+            "name": "Eris",
+            "type": "Dwarf"
+        },
+        {
+            "name": "Haumea",
+            "type": "Dwarf"
+        },
+        {
+            "name": "Makemake",
+            "type": "Dwarf"
         }
     ]
 }

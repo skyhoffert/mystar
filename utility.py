@@ -7,7 +7,6 @@ __maintainer__ = 'Sky Hoffert'
 __email__ = 'skyhoffert@gmail.com'
 __status__ = 'Development'
 
-import json
 import sys
 
 def does_user_exist(username, password):
@@ -47,7 +46,10 @@ def add_new_user(username, password):
     return 'Success!'
     
 def get_user_system(username):
-    f = open('systems/{}.starsystem'.format(username), 'r')
+    try:
+        f = open('systems/{}.starsystem'.format(username), 'r')
+    except:
+        return False
     full = ''
     
     for line in f.readlines():

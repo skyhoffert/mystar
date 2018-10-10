@@ -8,7 +8,7 @@ __email__ = 'skyhoffert@gmail.com'
 __status__ = 'Development'
 
 import json
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import pickle
 from utility import *
 
@@ -25,7 +25,7 @@ def stars():
     
 @app.route('/verify', methods=['POST'])
 def verify():
-    payload = request.json
+    payload = pickle.loads(request.data)
     
     did_auth = does_user_exist(payload['username'], payload['password'])
     if did_auth != 'Success!':
@@ -35,7 +35,7 @@ def verify():
     
 @app.route('/add_user', methods=['POST'])
 def add_user():
-    payload = request.json
+    payload = pickle.loads(request.data)
     
     if payload['username'] != 'admin':
         return 'Elevated priveliges required to add new user.'
@@ -52,10 +52,15 @@ def add_user():
    
 @app.route('/system', methods=['POST'])
 def system():
-    payload = request.json
+    payload = pickle.loads(request.data)
     
     if payload['type'] == 'get':
-        return get_user_system(payload['username'])
+        system = get_user_system(payload['username'])
+        try:
+            system_json = json.loads(system)
+        except:
+            return 'Failed to load ' + str(payload['username']) + '\'s system.'
+        return jsonify(system)
 
 if __name__ == '__main__':
     app.run()
