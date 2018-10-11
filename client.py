@@ -17,7 +17,7 @@ import time
 from tkinter import Tk, Canvas, PhotoImage
 
 # ======== constants ================
-WAIT_TIME = 0.1
+WAIT_TIME = 0.01
 IMG_WIDTH_START = 128
 IMG_WIDTH_NEW = 256
 CANVAS_WIDTH = 1080
@@ -32,6 +32,13 @@ def move_image(canvas, image):
     for i in range(0,100):
         canvas.move(image, 1, 1)
         time.sleep(WAIT_TIME)
+
+def main_state_thread():
+    while True:
+        # fetch sky's system from the server
+        payload = pickle.dumps(json.loads('{"username":"sky", "type":"get"}'))
+        resp = requests.post('http://localhost:5000/system', data=payload)
+        json_obj = json.loads(resp.json())
 
 # ======== main function ============
 def main():
@@ -56,15 +63,20 @@ def main():
     image_objects.append(img)
     images.append(canvas.create_image(-IMG_WIDTH_NEW*3/8, -IMG_WIDTH_NEW*3/8, image=img, anchor='nw'))
     
-    # DEBUG
+    # create threads
     moving_image_thread = threading.Thread(target=move_image, args=(canvas, images[1]))
+    main_thread = threading.Thread(target=main_state_thread)
+    
+    # start threads
     #moving_image_thread.start()
+    main_thread.start()
     
     # start the GUI
     root.mainloop()
     
-    # DEBUG
+    # join threads
     #moving_image_thread.join()
+    main_thread.join()
 
 if __name__ == '__main__':
     main()
