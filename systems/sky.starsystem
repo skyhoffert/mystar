@@ -9,7 +9,8 @@
             "type": "G2V",
             "radius": 696e6,
             "mass": 1.9885e30,
-            "surfacetemp": 5772
+            "surfacetemp": 5772,
+            "colors": ["yellow"]
         }
     ],
     "planets": [

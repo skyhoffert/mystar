@@ -58,7 +58,9 @@ def system():
         system = get_user_system(payload['username'])
         try:
             system_json = json.loads(system)
-        except:
+        except Exception as e:
+            print(e)
+            sys.stdout.flush()
             return 'Failed to load ' + str(payload['username']) + '\'s system.'
         return jsonify(system)
 

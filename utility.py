@@ -10,7 +10,10 @@ __status__ = 'Development'
 import sys
 
 def does_user_exist(username, password):
-    f = open('users.log', 'r')
+    try:
+        f = open('users.log', 'r')
+    except:
+        return 'Failure.'
     
     for line in f.readlines():
         tokens = line.split(',', 1)
@@ -48,7 +51,9 @@ def add_new_user(username, password):
 def get_user_system(username):
     try:
         f = open('systems/{}.starsystem'.format(username), 'r')
-    except:
+    except Exception as e:
+        print(e)
+        sys.stdout.flush()
         return False
     full = ''
     
