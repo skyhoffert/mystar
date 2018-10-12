@@ -7,8 +7,9 @@ __maintainer__ = 'Sky Hoffert'
 __email__ = 'skyhoffert@gmail.com'
 __status__ = 'Development'
 
-import datetime
+from constants import *
 from copy import deepcopy
+import datetime
 import json
 from math import *
 import matplotlib.pyplot as plt
@@ -16,23 +17,9 @@ import numpy as np
 import random
 import sys
 
-# ================================ Constants ================================
-NUM_STARS = ((1,10), (2,9), (3,3), (4,1))
-NUM_PLANETS = ((4,10), (5,10), (6,10), (7,9), (8,9), (9,9), (10,8), (11,8), (12,8), (13,7), (14,7), (15,6))
-STAR_TYPES = (('Brown Dwarf',2), ('Red Dwarf', 20), ('Main Sequence Average Mass', 8), \
-('Main Sequence High Mass', 8), ('Giant', 4), ('Supergiant', 3), ('Hypergiant', 2), ('Neutron', 1))
-PLANET_TYPES = (('Gas Giant', 4), ('Terrestrial', 4), ('Dwarf', 5))
-SYSTEM_NAMES = (('Andromeda', 'Aquarius', 'Aquila', 'Ara', 'Argo', 'Aries', 'Auriga', 'Bootes', 'Cancer', 'Canis', \
-'Capricornus', 'Cassiopeia', 'Centaurus', 'Cepheus', 'Cetus', 'Corona', 'Corvus', 'Crater', 'Cygnus', 'Delphinus', \
-'Draco', 'Equuleus', 'Eridanus', 'Gemini', 'Hercules', 'Hydra', 'Leo', 'Lepus', 'Libra', 'Lupus', 'Lyra', 'Ophiuchus',\
- 'Orion', 'Pegasus', 'Perseus', 'Pisces', 'Sagittarius', 'Scorpius', 'Serpens', 'Taurus', 'Triangulum', 'Ursa', 'Virgo'), \
-('Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota', 'Kappa', 'Lambda', 'Mu', 'Nu', 'Xi', \
-'Omicron', 'Pi', 'Rho', 'Sigma', 'Tau', 'Upsilon', 'Phi', 'Chi', 'Psi', 'Omega'))
-
-PLANET_AVERAGE_MASSES = {'Gas Giant':1e26, 'Terrestrial':5e23, 'Dwarf':1e21}
-PLANET_AVERAGE_NUM_MOONS = {'Gas Giant':20, 'Terrestrial':2, 'Dwarf': 0.78}
-
-# ================================ Functions ================================
+# ===================================================================================================
+# ============================================ Functions ============================================
+# ===================================================================================================
 def generate_value_from_list(list):
     '''
     Returns a value from a predefined list meeting the proper format
@@ -83,10 +70,7 @@ def generate_planet_details(p):
     planet = {}
 
     # Mass:
-    # create a random exponent using a normal curve with (mean, stddev)
-    exponent = np.random.normal(0,0.6)
-    # use that exponent as a power of 10 to keep mass close to relative average
-    planet['mass'] = PLANET_AVERAGE_MASSES[p] * pow(10,exponent)
+    planet['mass'] = generate_planet_mass(p)
     
     # Moons:
     avg = PLANET_AVERAGE_NUM_MOONS[p]
@@ -104,6 +88,9 @@ def generate_planet_details(p):
     
     return planet
 
+# ===================================================================================================
+# ========================================== Star Generation ========================================
+# ===================================================================================================
 def generate_star_mass(s):
     '''
     Generates a star mass, given the type of Star
@@ -137,6 +124,9 @@ def generate_star_mass(s):
     elif s == 'Hypergiant':
         mean = 2.50e32
         stddev = 2.0e31
+    elif s == 'Neutron':
+        mean = 2.77e30
+        stddev = 1e29
 
     # use a normal curve to generate Star details
     mass = np.random.normal(mean, stddev)
@@ -154,6 +144,28 @@ def generate_star_radius(s, mass):
 
     return 6371e3
 
+# ===================================================================================================
+# ======================================== Planet Generation ========================================
+# ===================================================================================================
+def generate_planet_mass(p):
+    '''
+    Generates a planet mass, given the type of planet
+        @arg s: string; indicates the type of planet
+        @return: int; value for mass of given planet
+    '''
+
+    # load the mass and stddev from the constants file
+    mean = PLANET_AVERAGE_MASSES[p]
+    stddev = PLANET_STDDEV_MASSES[p]
+
+    # use a normal curve to generate Star details
+    power = np.random.normal(0, stddev)
+    mass = mean * pow(10, power)
+    return round(mass,-int(log10(mass)-3))
+
+# ===================================================================================================
+# ======================================== System Generation ========================================
+# ===================================================================================================
 def generate_system_age(stars):
     '''
     Generates a system age, given Stars present in the system
@@ -213,6 +225,9 @@ def generate_system_name():
 
     return system_name
 
+# ===================================================================================================
+# ============================================ Main =================================================
+# ===================================================================================================
 def main():
     '''
     Main function for the generate_system program
@@ -248,8 +263,7 @@ def main():
     age = generate_system_age(stars)
 
     # assemble values in to a dictionary
-    system_dict = {"discovered_by": "sky", "date_discovered": "{0:%d %b %Y}".format(datetime.datetime.utcnow()), "name": system_name, \
-    "age": age, "stars": [], "planets": []}
+    system_dict = {"discovered_by": "sky", "date_discovered": "{0:%d %b %Y}".format(datetime.datetime.utcnow()), "name": system_name,    "age": age, "stars": [], "planets": []}
 
     # DEBUG
     print(system_dict)
