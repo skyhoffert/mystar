@@ -9,6 +9,7 @@ __status__ = 'Development'
 
 from constants import *
 import datetime
+import json
 from math import *
 import numpy as np
 import random
@@ -45,42 +46,47 @@ def generate_star_details(s):
     '''
 
     star = {}
-
-    # Mass:
-    star['mass'] = generate_star_mass(s)
-
-    # Radius:
-    # TODO
     
-    # Temperature
-    # TODO
+    star['type'] = s
+    star['mass'] = generate_star_mass(s)
+    star['radius'] = generate_star_radius(s, star['mass'])
+    star['surface_temp'] = generate_star_temperature(s, star['mass'], star['radius'])
+    star['parent'] = ''
+    star['colors'] = []
+    star['alternate_names'] = []
 
     return star
 
-def generate_planet_details(p):
+def generate_planet_details(p, system):
     '''
     Generates a dictionary object that fully describes a new planet
         @arg p: string; describes the type of planet
+        @arg system: dict; describes the entire system
         @return: dict; all details about the new planet
     '''
     planet = {}
 
-    # Mass:
+    planet['type'] = p
+    planet['parent'] = system['stars'][random.randrange(0,len(system['stars']))]['name']
     planet['mass'] = generate_planet_mass(p)
+    planet['radius'] = generate_planet_radius(p, planet['mass'])
+    planet['semi_major_axis'] = generate_planet_sma(planet, planet['parent'])
+    planet['rings'] = []
+    planet['moons'] = []
     
     # Moons:
     avg = PLANET_AVERAGE_NUM_MOONS[p]
     # use a normal curve with mean equal to average and a fitting stddev
-    planet['nummoons'] = abs(floor(np.random.normal(avg,avg/2)))
+    num_moons = abs(floor(np.random.normal(avg,avg/2)))
     # special case, if gas giant, add minimum number of moons!
     if p == 'Gas Giant':
-        planet['nummoons'] += PLANET_AVERAGE_NUM_MOONS[p]
+        num_moons += PLANET_AVERAGE_NUM_MOONS[p]
     
     # Rings:
     # only applies to gas giants!
     if p == 'Gas Giant':
-        # use a 50/50 chance for now ;)
-        planet['rings'] = [True] if random.random() < 0.5 else []
+        # TODO: add chance for rings to gas giants
+        pass
     
     return planet
 
@@ -110,9 +116,24 @@ def generate_star_radius(s, mass):
         @return: int; radius of given Star in meters
     '''
 
-    # TODO
+    # TODO: implement the radius correctly
+    radius = 695.5e6
 
-    return 6371e3
+    return round(radius)
+
+def generate_star_temperature(s, mass, radius):
+    '''
+    Generate the temperature of a given type of Star, depending on Mass and Radius
+        @arg s: string; the type of Star provided
+        @arg mass: int; mass of the given Star in kg
+        @arg radius: int; radius of the given Star in m
+        @return: int; temperature of given star in Kelvin
+    '''
+
+    # TODO: implement
+    temperature = 5778
+
+    return round(temperature)
 
 # ===================================================================================================
 # ======================================== Planet Generation ========================================
@@ -120,7 +141,7 @@ def generate_star_radius(s, mass):
 def generate_planet_mass(p):
     '''
     Generates a planet mass, given the type of planet
-        @arg s: string; indicates the type of planet
+        @arg p: string; indicates the type of planet
         @return: int; value for mass of given planet
     '''
 
@@ -132,6 +153,30 @@ def generate_planet_mass(p):
     power = np.random.normal(0, stddev)
     mass = mean * pow(10, power)
     return round(mass,-int(log10(mass)-3))
+
+def generate_planet_radius(p, mass):
+    '''
+    Generates a planet radius, given the type of planet and mass
+        @arg p: string; indicates the type of planet
+        @arg mass: int; mass of the given planet in kg
+        @return: int; value for radius of given planet
+    '''
+
+    # TODO: implement
+
+    return round(6371e3)
+
+def generate_planet_sma(planet, system):
+    '''
+    Generates a planet orbital radius (semi-major-axis), given the planet and system
+        @arg planet: dict; describes the given planet
+        @arg system: dict; describes the entire system
+        @return: int; orbital radius value in meters
+    '''
+
+    # TODO: implement
+
+    return round(149.598e9)
 
 # ===================================================================================================
 # ======================================== System Generation ========================================
@@ -191,40 +236,43 @@ def main():
     Main function for the generate_system program
     '''
     system_name = generate_system_name()
-    print(system_name)
+    print('System: {}'.format(system_name))
 
     num_stars = generate_value_from_list(NUM_STARS)
     stars = []
+    star_types = []
     print('================================ {} Star(s) =================================='.format(str(num_stars)))
     star_letter_int = ord('A')
     for star in range(0, num_stars):
         star_type = generate_value_from_list(STAR_TYPES)
-        print('{} {}: {}'.format(system_name, chr(star_letter_int), star_type))
         details = generate_star_details(star_type)
         name = '{} {}'.format(system_name, chr(star_letter_int))
         details['name'] = name
+        print(name)
         print('  ', details)
         star_letter_int += 1
-        stars.append(star_type)
+        star_types.append(star_type)
+        stars.append(details)
+
+    # at this point we can perform some calculations for system values
+    age = generate_system_age(star_types)
+
+    # assemble values in to a dictionary
+    system_dict = {"discovered_by": "sky", "date_discovered": "{0:%d %b %Y}".format(datetime.datetime.utcnow()), "name": system_name,    "age": age, "stars": stars, "planets": []}
     
+    # now, time to generate a random number of planets
     num_planets = generate_value_from_list(NUM_PLANETS)
     planets = []
     print('================================ {} Planets ================================'.format(num_planets))
     for p in range(0, num_planets):
         planet = generate_value_from_list(PLANET_TYPES)
-        print(planet)
-        details = generate_planet_details(planet)
-        print('  ', details)
+        details = generate_planet_details(planet, system_dict)
         planets.append(details)
-    
-    # finally, perform some calculations for system values
-    age = generate_system_age(stars)
 
-    # assemble values in to a dictionary
-    system_dict = {"discovered_by": "sky", "date_discovered": "{0:%d %b %Y}".format(datetime.datetime.utcnow()), "name": system_name,    "age": age, "stars": [], "planets": []}
+    system_dict['planets'] = planets
 
     # DEBUG
-    print(system_dict)
+    print(json.dumps(system_dict, sort_keys=True, indent=2))
     
 if __name__ == '__main__':
     main()
