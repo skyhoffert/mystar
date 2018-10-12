@@ -7,21 +7,20 @@ __maintainer__ = 'Sky Hoffert'
 __email__ = 'skyhoffert@gmail.com'
 __status__ = 'Development'
 
-import calendar
+import datetime
 from copy import deepcopy
 import json
-from math import floor
+from math import *
 import matplotlib.pyplot as plt
 import numpy as np
 import random
 import sys
-import time
 
 # ================================ Constants ================================
 NUM_STARS = ((1,10), (2,9), (3,3), (4,1))
 NUM_PLANETS = ((4,10), (5,10), (6,10), (7,9), (8,9), (9,9), (10,8), (11,8), (12,8), (13,7), (14,7), (15,6))
-STAR_TYPES = (('Brown Dwarf Star',2), ('Red Dwarf Star', 20), ('Main Sequence Average Mass Star', 8), \
-('Main Sequence High Mass Star', 8), ('Giant Star', 4), ('Supergiant Star', 3), ('Hypergiant Star', 2), ('Neutron Star', 1))
+STAR_TYPES = (('Brown Dwarf',2), ('Red Dwarf', 20), ('Main Sequence Average Mass', 8), \
+('Main Sequence High Mass', 8), ('Giant', 4), ('Supergiant', 3), ('Hypergiant', 2), ('Neutron', 1))
 PLANET_TYPES = (('Gas Giant', 4), ('Terrestrial', 4), ('Dwarf', 5))
 SYSTEM_NAMES = (('Andromeda', 'Aquarius', 'Aquila', 'Ara', 'Argo', 'Aries', 'Auriga', 'Bootes', 'Cancer', 'Canis', \
 'Capricornus', 'Cassiopeia', 'Centaurus', 'Cepheus', 'Cetus', 'Corona', 'Corvus', 'Crater', 'Cygnus', 'Delphinus', \
@@ -54,6 +53,26 @@ def generate_value_from_list(list):
         total_running += l[1]
         if val < total_running:
             return l[0]
+
+def generate_star_details(s):
+    '''
+    Generates a dictionary object that fully describes a new Star
+        @arg s: string; describes the type of Star
+        @return: dict; all details about the new Star
+    '''
+
+    star = {}
+
+    # Mass:
+    star['mass'] = generate_star_mass(s)
+
+    # Radius:
+    # TODO
+    
+    # Temperature
+    # TODO
+
+    return star
 
 def generate_planet_details(p):
     '''
@@ -89,23 +108,80 @@ def generate_star_mass(s):
     '''
     Generates a star mass, given the type of Star
         @arg s: string; indicates the type of star
-        @return: float; value for mass of given star
+        @return: int; value for mass of given star
+    '''
+
+    # first, find the average mass for given type of star
+    mean = 0
+    stddev = 0
+
+    # unfortunately, this must be done manually
+    if s == 'Brown Dwarf':
+        mean = 8.75e28
+        stddev = 1.5e28
+    elif s == 'Red Dwarf':
+        mean = 5.72e29
+        stddev = 1.5e29
+    elif s == 'Main Sequence Average Mass':
+        mean = 1.00e30
+        stddev = 1.2e29
+    elif s == 'Main Sequence High Mass':
+        mean = 5.00e30
+        stddev = 0.8e30
+    elif s == 'Giant':
+        mean = 1.00e31
+        stddev = 1.2e30
+    elif s == 'Supergiant':
+        mean = 7.96e31
+        stddev = 1.5e31
+    elif s == 'Hypergiant':
+        mean = 2.50e32
+        stddev = 2.0e31
+
+    # use a normal curve to generate Star details
+    mass = np.random.normal(mean, stddev)
+    return round(mass,-int(log10(mass)-3))
+
+def generate_star_radius(s, mass):
+    '''
+    Generates the radius of a given type of Star, depending on the Mass
+        @arg s: string; the type of Star provided
+        @arg mass: int; mass of the given Star in kg to correlate a radius to
+        @return: int; radius of given Star in meters
     '''
 
     # TODO
 
-    return 1e30
+    return 6371e3
 
-def generate_star_age(stars):
+def generate_system_age(stars):
     '''
     Generates a system age, given Stars present in the system
         @arg stars: list; provides given stars in a system
-        @return: float; age of the Star
+        @return: int; age of the Star in years
     '''
 
-    # TODO
+    # use this variable to keep track of the limiting star in the system
+    # Star cannot be older than the age of the Universe...
+    longest = 13.7e9
 
-    return 4.6e9
+    # check every Star given
+    for s in stars:
+        if s == 'Main Sequence Average Mass':
+            # Stars like the sun last up to around 10 billion years
+            longest = 10e9 if 10e9 < longest else longest
+        elif s == 'Main Sequence High Mass':
+            # Higher mass Stars than the Sun last less time
+            longest = 5e9 if 5e9 < longest else longest
+        elif s == 'Giant':
+            longest = 1e9 if 1e9 < longest else longest
+        elif s == 'Supergiant':
+            longest = 100e6 if 100e6 < longest else longest
+        elif s == 'Hypergiant':
+            # Hypergiants have a very short lifetime
+            longest = 10e6 if 10e6 < longest else longest
+
+    return int(random.random() * longest)
 
 def system_type(num_stars):
     '''
@@ -134,7 +210,7 @@ def generate_system_name():
     system_name += '-' + SYSTEM_NAMES[1][random.randint(0, len(SYSTEM_NAMES[1])-1)]
     # third element is a constellation
     system_name += ' ' + SYSTEM_NAMES[0][random.randint(0, len(SYSTEM_NAMES[0])-1)]
-    
+
     return system_name
 
 def main():
@@ -149,8 +225,14 @@ def main():
     print('================================ {} Star(s) =================================='.format(str(num_stars)))
     star_letter_int = ord('A')
     for star in range(0, num_stars):
-        print('{} {}: {}'.format(system_name, chr(star_letter_int), generate_value_from_list(STAR_TYPES)))
+        star_type = generate_value_from_list(STAR_TYPES)
+        print('{} {}: {}'.format(system_name, chr(star_letter_int), star_type))
+        details = generate_star_details(star_type)
+        name = '{} {}'.format(system_name, chr(star_letter_int))
+        details['name'] = name
+        print('  ', details)
         star_letter_int += 1
+        stars.append(star_type)
     
     num_planets = generate_value_from_list(NUM_PLANETS)
     planets = []
@@ -163,10 +245,10 @@ def main():
         planets.append(details)
     
     # finally, perform some calculations for system values
-    age = generate_star_age(stars)
+    age = generate_system_age(stars)
 
     # assemble values in to a dictionary
-    system_dict = {"discovered_by": "sky", "date_discovered": calendar.timegm(time.gmtime()), "name": system_name, \
+    system_dict = {"discovered_by": "sky", "date_discovered": "{0:%d %b %Y}".format(datetime.datetime.utcnow()), "name": system_name, \
     "age": age, "stars": [], "planets": []}
 
     # DEBUG
