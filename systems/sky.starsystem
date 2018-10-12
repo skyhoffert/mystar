@@ -1,14 +1,14 @@
 {
     "discovered_by": "sky",
-    "time_discovered": "1539333806",
+    "date_discovered": "12 Oct 2018",
     "name": "Solar System",
     "age": 4.6e9,
     "stars": [
         {
             "name": "Sun",
             "parent": "",
-            "type": "G2V",
-            "radius": 696e6,
+            "type": "Main Sequence Average Mass",
+            "radius": 695.5e6,
             "mass": 1.9885e30,
             "surface_temp": 5772,
             "colors": ["yellow"],
