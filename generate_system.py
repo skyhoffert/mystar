@@ -7,6 +7,7 @@ __maintainer__ = 'Sky Hoffert'
 __email__ = 'skyhoffert@gmail.com'
 __status__ = 'Development'
 
+from copy import deepcopy
 from constants import *
 import datetime
 import json
@@ -66,13 +67,31 @@ def generate_planet_details(p, system):
     '''
     planet = {}
 
+    # name is set first to a ? to indicate it is being modified
+    planet['name'] = '?'
+
     planet['type'] = p
     planet['parent'] = system['stars'][random.randrange(0,len(system['stars']))]['name']
+    
+    # now that the planet has a parent, it can be named properly
+    planet['name'] = generate_planet_name(system, planet['parent'])
+
     planet['mass'] = generate_planet_mass(p)
     planet['radius'] = generate_planet_radius(p, planet['mass'])
     planet['semi_major_axis'] = generate_planet_sma(planet, planet['parent'])
+    planet['eccentricity'] = generate_planet_eccentricity(planet, system)
+    planet['inclination'] = generate_planet_inclination(planet, system)
+    planet['rotation_period'] = generate_planet_rotation_period(planet)
+    planet['axial_tilt'] = generate_planet_axial_tilt(planet)
+    planet['albedo'] = generate_planet_albedo(planet)
+    planet['surface_pressure'] = generate_planet_surface_pressure(planet)
+    planet['surface_temp_min'] = generate_planet_temp_min(planet)
+    planet['surface_temp_max'] = generate_planet_temp_max(planet)
+    planet['colors'] = generate_planet_colors(planet)
+
     planet['rings'] = []
     planet['moons'] = []
+    planet['alternate_names'] = []
     
     # Moons:
     avg = PLANET_AVERAGE_NUM_MOONS[p]
@@ -175,8 +194,131 @@ def generate_planet_sma(planet, system):
     '''
 
     # TODO: implement
+    sma = 149.598e9
 
-    return round(149.598e9)
+    return round(sma)
+
+def generate_planet_name(system, parent):
+    '''
+    Generates a planet name given the system and parent
+        @arg system: dict; describes the entire system
+        @arg parent: dict; describes the parent object
+        @return: string; name for the planet
+    '''
+
+    # keep track of how many children the parent has
+    num_parent_children = 0
+
+    # loop through all planets in the system
+    for planet in system['planets']:
+        # detect if this planet is the one we are naming
+        if planet['name'] == '?':
+            continue
+
+        # otherwise, check if the parent has other children
+        if planet['parent'] == parent:
+            num_parent_children += 1
+
+    # add a lowercase letter to indicate a planet
+    return '{}{}'.format(parent, chr(ord('a') + num_parent_children))
+
+def generate_planet_eccentricity(planet, system):
+    '''
+    Generates an eccentricity value based on the existing system
+        @arg planet: dict; describes the target planet
+        @arg system: dict; describes the target system
+        @return: float; eccentricity value for planetary orbit
+    '''
+
+    # TODO: implement
+    e = 0.0167
+
+    return round(e, 4)
+
+def generate_planet_inclination(planet, system):
+    '''
+    TODO
+    '''
+
+    # TODO
+    i = 7.155
+
+    return round(i, 4)
+
+def generate_planet_rotation_period(planet):
+    '''
+    TODO
+    '''
+
+    # TODO
+    rot_per = 86400
+
+    return round(rot_per)
+
+def generate_planet_axial_tilt(planet):
+    '''
+    TODO
+    '''
+
+    # TODO
+    tilt = 23.439
+
+    return round(tilt, 4)
+    
+def generate_planet_albedo(planet):
+    '''
+    TODO
+    '''
+
+    # TODO
+    a = 0.367
+
+    return round(a, 4)
+
+def generate_planet_surface_pressure(planet):
+    '''
+    TODO
+    '''
+
+    # TODO
+    P = 101.325
+
+    return round(P, 4)
+    
+def generate_planet_temp_min(planet):
+    '''
+    TODO
+    '''
+
+    # TODO
+    T = 184
+
+    return round(T, 4)
+    
+def generate_planet_temp_max(planet):
+    '''
+    TODO
+    '''
+
+    # TODO
+    T = 330
+
+    return round(T, 4)
+    
+def generate_planet_colors(planet):
+    '''
+    TODO
+    '''
+
+    colors = []
+    temp = deepcopy(PLANET_ALL_COLORS)
+    random.shuffle(temp)
+    num = random.randint(PLANET_MIN_COLORS, PLANET_MAX_COLORS)
+    for i in range(0, num):
+        colors.append(temp[0])
+        del temp[0]
+
+    return colors
 
 # ===================================================================================================
 # ======================================== System Generation ========================================
@@ -219,12 +361,12 @@ def generate_system_name():
         @return: string; name of a new system
     '''
     # first element is a random, 4 digit number
-    system_name  = str(1000 + random.randint(0, 8999))
+    system_name  = str(1000 + random.randrange(0, 9000))
     # second element is a two part letter definition using the greek alphabet
-    system_name += ' ' + SYSTEM_NAMES[1][random.randint(0, len(SYSTEM_NAMES[1])-1)]
-    system_name += '-' + SYSTEM_NAMES[1][random.randint(0, len(SYSTEM_NAMES[1])-1)]
+    system_name += ' ' + SYSTEM_NAMES[1][random.randrange(0, len(SYSTEM_NAMES[1]))]
+    system_name += '-' + SYSTEM_NAMES[1][random.randrange(0, len(SYSTEM_NAMES[1]))]
     # third element is a constellation
-    system_name += ' ' + SYSTEM_NAMES[0][random.randint(0, len(SYSTEM_NAMES[0])-1)]
+    system_name += ' ' + SYSTEM_NAMES[0][random.randrange(0, len(SYSTEM_NAMES[0]))]
 
     return system_name
 
@@ -235,6 +377,7 @@ def main():
     '''
     Main function for the generate_system program
     '''
+
     system_name = generate_system_name()
     print('System: {}'.format(system_name))
 
@@ -268,8 +411,7 @@ def main():
         planet = generate_value_from_list(PLANET_TYPES)
         details = generate_planet_details(planet, system_dict)
         planets.append(details)
-
-    system_dict['planets'] = planets
+        system_dict['planets'].append(details)
 
     # DEBUG
     print(json.dumps(system_dict, sort_keys=True, indent=2))

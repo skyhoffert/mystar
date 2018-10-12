@@ -18,3 +18,7 @@ STAR_STDDEV_MASSES = {'Brown Dwarf': 1.5e28, 'Red Dwarf': 1.5e29, 'Main Sequence
 PLANET_AVERAGE_NUM_MOONS = {'Gas Giant':20, 'Terrestrial':2, 'Dwarf': 0.78}
 PLANET_AVERAGE_MASSES = {'Dwarf': 1.00e21, 'Terrestrial': 5.00e23, 'Gas Giant': 5.00e26}
 PLANET_STDDEV_MASSES = {'Dwarf': 0.8, 'Terrestrial': 0.6, 'Gas Giant': 0.8}
+
+PLANET_ALL_COLORS = ['gray', 'white', 'yellow', 'tan', 'blue', 'green', 'red', 'maroon', 'pink', 'orange']
+PLANET_MIN_COLORS = 1
+PLANET_MAX_COLORS = 4
