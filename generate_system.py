@@ -8,14 +8,10 @@ __email__ = 'skyhoffert@gmail.com'
 __status__ = 'Development'
 
 from constants import *
-from copy import deepcopy
 import datetime
-import json
 from math import *
-import matplotlib.pyplot as plt
 import numpy as np
 import random
-import sys
 
 # ===================================================================================================
 # ============================================ Functions ============================================
@@ -99,34 +95,8 @@ def generate_star_mass(s):
     '''
 
     # first, find the average mass for given type of star
-    mean = 0
-    stddev = 0
-
-    # unfortunately, this must be done manually
-    if s == 'Brown Dwarf':
-        mean = 8.75e28
-        stddev = 1.5e28
-    elif s == 'Red Dwarf':
-        mean = 5.72e29
-        stddev = 1.5e29
-    elif s == 'Main Sequence Average Mass':
-        mean = 1.00e30
-        stddev = 1.2e29
-    elif s == 'Main Sequence High Mass':
-        mean = 5.00e30
-        stddev = 0.8e30
-    elif s == 'Giant':
-        mean = 1.00e31
-        stddev = 1.2e30
-    elif s == 'Supergiant':
-        mean = 7.96e31
-        stddev = 1.5e31
-    elif s == 'Hypergiant':
-        mean = 2.50e32
-        stddev = 2.0e31
-    elif s == 'Neutron':
-        mean = 2.77e30
-        stddev = 1e29
+    mean = STAR_AVERAGE_MASSES[s]
+    stddev = STAR_STDDEV_MASSES[s]
 
     # use a normal curve to generate Star details
     mass = np.random.normal(mean, stddev)
@@ -179,19 +149,7 @@ def generate_system_age(stars):
 
     # check every Star given
     for s in stars:
-        if s == 'Main Sequence Average Mass':
-            # Stars like the sun last up to around 10 billion years
-            longest = 10e9 if 10e9 < longest else longest
-        elif s == 'Main Sequence High Mass':
-            # Higher mass Stars than the Sun last less time
-            longest = 5e9 if 5e9 < longest else longest
-        elif s == 'Giant':
-            longest = 1e9 if 1e9 < longest else longest
-        elif s == 'Supergiant':
-            longest = 100e6 if 100e6 < longest else longest
-        elif s == 'Hypergiant':
-            # Hypergiants have a very short lifetime
-            longest = 10e6 if 10e6 < longest else longest
+        longest = STAR_LIFETIMES[s] if STAR_LIFETIMES[s] < longest else longest
 
     return int(random.random() * longest)
 
