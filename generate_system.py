@@ -307,13 +307,23 @@ def generate_planet_temp_max(planet):
     
 def generate_planet_colors(planet):
     '''
-    TODO
+    Generates a list of colors to associate with the given planet
+        @arg planet: dict; describes the planet
+        @return: list; colors that should be attached to the planet
     '''
 
     colors = []
+
+    # make a deep copy, not to interfere with the real array
     temp = deepcopy(PLANET_ALL_COLORS)
+
+    # shuffle the copy we made to randomize
     random.shuffle(temp)
+
+    # randomly (uniformly) select a number of colors
     num = random.randint(PLANET_MIN_COLORS, PLANET_MAX_COLORS)
+
+    # iterate through as many as was chosen
     for i in range(0, num):
         colors.append(temp[0])
         del temp[0]
