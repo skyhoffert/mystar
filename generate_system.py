@@ -53,7 +53,7 @@ def generate_star_details(s):
     star['radius'] = generate_star_radius(s, star['mass'])
     star['surface_temp'] = generate_star_temperature(s, star['mass'], star['radius'])
     star['parent'] = ''
-    star['colors'] = []
+    star['colors'] = generate_star_colors(star)
     star['alternate_names'] = []
 
     return star
@@ -136,7 +136,8 @@ def generate_star_radius(s, mass):
     '''
 
     # TODO: implement the radius correctly
-    radius = 695.5e6
+    num_stddevs_away = (mass - STAR_AVERAGE_MASSES[s]) / STAR_STDDEV_MASSES[s]
+    radius = STAR_AVERAGE_RADII[s]  + STAR_STDDEV_RADII[s] * num_stddevs_away * np.random.normal(1,0.1)
 
     return round(radius)
 
@@ -153,6 +154,22 @@ def generate_star_temperature(s, mass, radius):
     temperature = 5778
 
     return round(temperature)
+
+def generate_star_colors(star):
+    '''
+    Generates colors of a Star, given the type
+        @arg star: dict; describes the Star
+        @return: list; of colors describing the Star
+    '''
+
+    # fetch the predefined possible colors
+    temp = STAR_COLORS[star['type']]
+    
+    # remove wrong colors if giant type
+    if star['type'] in ['Main Sequence High Mass', 'Giant', 'Supergiant', 'Hypergiant']:
+        del temp[round(random.random())]
+
+    return temp
 
 # ===================================================================================================
 # ======================================== Planet Generation ========================================
