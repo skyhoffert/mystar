@@ -135,7 +135,7 @@ def generate_star_radius(s, mass):
         @return: int; radius of given Star in meters
     '''
 
-    # TODO: implement the radius correctly
+    # use the difference in mass to calculate a correlated difference in radius
     num_stddevs_away = (mass - STAR_AVERAGE_MASSES[s]) / STAR_STDDEV_MASSES[s]
     radius = STAR_AVERAGE_RADII[s]  + STAR_STDDEV_RADII[s] * num_stddevs_away * np.random.normal(1,0.1)
 
@@ -150,10 +150,10 @@ def generate_star_temperature(s, mass, radius):
         @return: int; temperature of given star in Kelvin
     '''
 
-    # TODO: implement
-    temperature = 5778
+    num_stddevs_away = (mass - STAR_AVERAGE_MASSES[s]) / STAR_STDDEV_MASSES[s]
+    temp = STAR_AVERAGE_TEMPERATURE[s] + STAR_STDDEV_TEMPERATURE[s] * num_stddevs_away * np.random.normal(1,0.1)
 
-    return round(temperature)
+    return round(temp)
 
 def generate_star_colors(star):
     '''
@@ -181,13 +181,12 @@ def generate_planet_mass(p):
         @return: int; value for mass of given planet
     '''
 
-    # load the mass and stddev from the constants file
+    # first, find the average mass for given type of star
     mean = PLANET_AVERAGE_MASSES[p]
     stddev = PLANET_STDDEV_MASSES[p]
 
     # use a normal curve to generate Star details
-    power = np.random.normal(0, stddev)
-    mass = mean * pow(10, power)
+    mass = np.random.normal(mean, stddev)
     return round(mass,-int(log10(mass)-3))
 
 def generate_planet_radius(p, mass):
@@ -198,9 +197,11 @@ def generate_planet_radius(p, mass):
         @return: int; value for radius of given planet
     '''
 
-    # TODO: implement
+    # use the difference in mass to calculate a correlated difference in radius
+    num_stddevs_away = (mass - PLANET_AVERAGE_MASSES[p]) / PLANET_STDDEV_MASSES[p]
+    radius = PLANET_AVERAGE_RADII[p]  + PLANET_STDDEV_RADII[p] * num_stddevs_away * np.random.normal(1,0.1)
 
-    return round(6371e3)
+    return round(radius)
 
 def generate_planet_sma(planet, system):
     '''
@@ -247,10 +248,13 @@ def generate_planet_eccentricity(planet, system):
         @return: float; eccentricity value for planetary orbit
     '''
 
-    # TODO: implement
-    e = 0.0167
+    # first, find the average mass for given type of star
+    mean = PLANET_AVERAGE_ECCENTRICITY[planet['type']]
+    stddev = PLANET_STDDEV_ECCENTRICITY[planet['type']]
 
-    return round(e, 4)
+    # use a normal curve to generate Star details
+    ecc = np.random.normal(mean, stddev)
+    return round(ecc,6)
 
 def generate_planet_inclination(planet, system):
     '''
