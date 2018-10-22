@@ -27,7 +27,16 @@ PLANET_AVERAGE_RADII = {'Dwarf': 1188e3, 'Terrestrial': 6371e3, 'Gas Giant': 320
 PLANET_STDDEV_RADII = {'Dwarf': 200e3, 'Terrestrial': 1000e3, 'Gas Giant': 8000e3}
 PLANET_AVERAGE_ECCENTRICITY = {'Dwarf': 0.1, 'Terrestrial': 0.01, 'Gas Giant': 0.005}
 PLANET_STDDEV_ECCENTRICITY = {'Dwarf': 0.08, 'Terrestrial': 0.008, 'Gas Giant': 0.004}
+PLANET_AVERAGE_ROTATION_PERIOD = {'Dwarf': 86400, 'Terrestrial': 86400, 'Gas Giant': 40000}
+PLANET_STDDEV_ROTATION_PERIOD = {'Dwarf': 43200, 'Terrestrial': 10000, 'Gas Giant': 10000}
+
+PLANET_AVERAGE_INCLINATION = 0.0
+PLANET_STDDEV_INCLINATION = 3.0
+
+PLANET_RINGS_TYPES = (('None', 8), ('Single', 4), ('Many', 3))
 
 PLANET_ALL_COLORS = ['gray', 'white', 'yellow', 'tan', 'blue', 'green', 'red', 'maroon', 'pink', 'orange']
 PLANET_MIN_COLORS = 1
 PLANET_MAX_COLORS = 4
+
+CONST_G = 6.674e-11

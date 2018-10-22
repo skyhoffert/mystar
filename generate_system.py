@@ -253,27 +253,37 @@ def generate_planet_eccentricity(planet, system):
     stddev = PLANET_STDDEV_ECCENTRICITY[planet['type']]
 
     # use a normal curve to generate Star details
-    ecc = np.random.normal(mean, stddev)
+    ecc = abs(np.random.normal(mean, stddev))
     return round(ecc,6)
 
 def generate_planet_inclination(planet, system):
     '''
-    TODO
+    Generates an inclination for this planet, based off the existing system
+        @arg planet: dict; describes the target planet
+        @arg system: dict; describes the target system
+        @return: float; inclination angle in degrees
     '''
 
-    # TODO
-    i = 7.155
+    # if the first planet, return 0 degrees - our systems will use the first planet as a basis
+    if planet['name'][-1] == 'a':
+        return 0.0
+
+    i = abs(np.random.normal(PLANET_AVERAGE_INCLINATION, PLANET_STDDEV_INCLINATION))
 
     return round(i, 4)
 
 def generate_planet_rotation_period(planet):
     '''
-    TODO
+    Generates a rotational period
+        @arg planet: dict; describes the target planet
+        @return: float; rotational period in seconds
     '''
 
-    # TODO
-    rot_per = 86400
+    # first, find the average and stddev for each type
+    mean = PLANET_AVERAGE_ROTATION_PERIOD[planet['type']]
+    stddev = PLANET_STDDEV_ROTATION_PERIOD[planet['type']]
 
+    rot_per = abs(np.random.normal(mean, stddev))
     return round(rot_per)
 
 def generate_planet_axial_tilt(planet):
