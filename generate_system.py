@@ -284,6 +284,13 @@ def generate_planet_rotation_period(planet):
     stddev = PLANET_STDDEV_ROTATION_PERIOD[planet['type']]
 
     rot_per = abs(np.random.normal(mean, stddev))
+
+    # make some planets randomly have retrograde rotation, not gas giants though
+    if planet['type'] == 'Dwarf' or planet['type'] == 'Gas Giant':
+        if random.random() < PLANET_RETROGRADE_CHANCE:
+            # retrograde rotations probably have longer rotation rates as well
+            rot_per *= -PLANET_RETROGRADE_LENGTH_INCREASE
+
     return round(rot_per)
 
 def generate_planet_axial_tilt(planet):
@@ -291,10 +298,12 @@ def generate_planet_axial_tilt(planet):
     TODO
     '''
 
-    # TODO
-    tilt = 23.439
+    # first, find the average and stddev for each type
+    mean = PLANET_AVERAGE_AXIAL_TILT[planet['type']]
+    stddev = PLANET_STDDEV_AXIAL_TILT[planet['type']]
 
-    return round(tilt, 4)
+    tilt = abs(np.random.normal(mean, stddev))
+    return round(tilt)
     
 def generate_planet_albedo(planet):
     '''
