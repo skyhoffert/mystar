@@ -532,6 +532,15 @@ def main():
 
     # DEBUG
     print(json.dumps(system_dict, sort_keys=True, indent=2))
+
+    # create a json object
+    json_obj = json.dumps(system_dict)
+
+    # save to file in the systems folder
+    system_name = system_dict['name'].replace(' ', '_')
+    f = open('systems/{}'.format(system_name), 'w')
+    f.write(json_obj)
+    f.close()
     
 if __name__ == '__main__':
     main()
