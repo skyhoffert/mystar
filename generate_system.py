@@ -210,11 +210,21 @@ def generate_planet_sma(planet, system):
         @return: int; orbital radius value in meters
     '''
 
-    # TODO: finish
-    sma = np.random.chisquare(5)*100e9 + 50e9
-    planet['semi_major_axis'] = sma
-    print('For planet ', planet['name'])
-    print(calculate_orbital_clearing(planet, system))
+    # Loop until a good sma is found
+    passing = False
+    while not passing:
+        planet['semi_major_axis'] = np.random.chisquare(5)*SEMI_MAJOR_AXIS_FACTOR + SEMI_MAJOR_AXIS_OFFSET
+        sma = planet['semi_major_axis']
+        passing = True
+        for p in system['planets']:
+            if planet['parent'] == p['parent']:
+                this_clearance = calculate_orbital_clearing(planet, system)
+                p_clearance = calculate_orbital_clearing(p, system)
+                max_sma = p['semi_major_axis'] - p_clearance - this_clearance
+                min_sma = p['semi_major_axis'] + p_clearance + this_clearance
+                if sma > max_sma and sma < min_sma:
+                    passing = False
+                    break
 
     return round(sma)
 
