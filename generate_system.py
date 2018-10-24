@@ -13,7 +13,6 @@ import datetime
 import json
 from math import *
 import numpy as np
-import random
 
 # ===================================================================================================
 # ============================================ Functions ============================================
@@ -71,14 +70,14 @@ def generate_planet_details(p, system):
     planet['name'] = '?'
 
     planet['type'] = p
-    planet['parent'] = system['stars'][random.randrange(0,len(system['stars']))]['name']
+    planet['parent'] = system['stars'][np.random.randint(0,len(system['stars']))]['name']
     
     # now that the planet has a parent, it can be named properly
     planet['name'] = generate_planet_name(system, planet['parent'])
 
     planet['mass'] = generate_planet_mass(p)
     planet['radius'] = generate_planet_radius(p, planet['mass'])
-    planet['semi_major_axis'] = generate_planet_sma(planet, planet['parent'])
+    planet['semi_major_axis'] = generate_planet_sma(planet, system)
     planet['eccentricity'] = generate_planet_eccentricity(planet, system)
     planet['inclination'] = generate_planet_inclination(planet, system)
     planet['rotation_period'] = generate_planet_rotation_period(planet)
@@ -167,7 +166,7 @@ def generate_star_colors(star):
     
     # remove wrong colors if giant type
     if star['type'] in ['Main Sequence High Mass', 'Giant', 'Supergiant', 'Hypergiant']:
-        del temp[round(random.random())]
+        del temp[round(np.random.uniform(0.0, 1.0))]
 
     return temp
 
@@ -211,8 +210,11 @@ def generate_planet_sma(planet, system):
         @return: int; orbital radius value in meters
     '''
 
-    # TODO: implement
-    sma = 149.598e9
+    # TODO: finish
+    sma = np.random.chisquare(5)*100e9 + 50e9
+    planet['semi_major_axis'] = sma
+    print('For planet ', planet['name'])
+    print(calculate_orbital_clearing(planet, system))
 
     return round(sma)
 
@@ -287,7 +289,7 @@ def generate_planet_rotation_period(planet):
 
     # make some planets randomly have retrograde rotation, not gas giants though
     if planet['type'] == 'Dwarf' or planet['type'] == 'Gas Giant':
-        if random.random() < PLANET_RETROGRADE_CHANCE:
+        if np.random.uniform(0.0, 1.0) < PLANET_RETROGRADE_CHANCE:
             # retrograde rotations probably have longer rotation rates as well
             rot_per *= -PLANET_RETROGRADE_LENGTH_INCREASE
 
@@ -362,10 +364,10 @@ def generate_planet_colors(planet):
     temp = deepcopy(PLANET_ALL_COLORS)
 
     # shuffle the copy we made to randomize
-    random.shuffle(temp)
+    np.random.shuffle(temp)
 
     # randomly (uniformly) select a number of colors
-    num = random.randint(PLANET_MIN_COLORS, PLANET_MAX_COLORS)
+    num = np.random.randint(PLANET_MIN_COLORS, PLANET_MAX_COLORS)
 
     # iterate through as many as was chosen
     for i in range(0, num):
@@ -392,7 +394,7 @@ def generate_system_age(stars):
     for s in stars:
         longest = STAR_LIFETIMES[s] if STAR_LIFETIMES[s] < longest else longest
 
-    return int(random.random() * longest)
+    return int(np.random.uniform(0.0, 1.0) * longest)
 
 def system_type(num_stars):
     '''
@@ -415,14 +417,53 @@ def generate_system_name():
         @return: string; name of a new system
     '''
     # first element is a random, 4 digit number
-    system_name  = str(1000 + random.randrange(0, 9000))
+    system_name  = str(1000 + np.random.randint(0, 9000))
     # second element is a two part letter definition using the greek alphabet
-    system_name += ' ' + SYSTEM_NAMES[1][random.randrange(0, len(SYSTEM_NAMES[1]))]
-    system_name += '-' + SYSTEM_NAMES[1][random.randrange(0, len(SYSTEM_NAMES[1]))]
+    system_name += ' ' + SYSTEM_NAMES[1][np.random.randint(0, len(SYSTEM_NAMES[1]))]
+    system_name += '-' + SYSTEM_NAMES[1][np.random.randint(0, len(SYSTEM_NAMES[1]))]
     # third element is a constellation
-    system_name += ' ' + SYSTEM_NAMES[0][random.randrange(0, len(SYSTEM_NAMES[0]))]
+    system_name += ' ' + SYSTEM_NAMES[0][np.random.randint(0, len(SYSTEM_NAMES[0]))]
 
     return system_name
+
+# ===================================================================================================
+# ============================================ Utility ==============================================
+# ===================================================================================================
+def find_parent_star(planet, system):
+    '''
+    Returns the dict describing the parent star of a given planet in a given system
+        @arg planet: dict; describes the target planet
+        @arg system: dict; describes the target star
+        @return: dict; describing the parent star
+    '''
+
+    # search the system for the parent
+    for star in system['stars']:
+        if planet['parent'] == star['name']:
+            return star
+    
+    # if no parent is found, return None
+    return None
+
+def calculate_orbital_clearing(planet, system):
+    '''
+    Calculates orbital clearing given certain planet parameters
+        @arg planet: dict; describes the target planet
+        @arg system: dict; describes the target system
+        @return: float; orbital clearing distance in m
+    '''
+
+    a = planet['semi_major_axis']
+    m = planet['mass']
+    M = find_parent_star(planet, system)['mass']
+
+    r_soi = a * (m / M)**(2/5)
+    clearing = r_soi * ORBIT_CLEAR_FACTOR
+
+    if clearing < ORBIT_CLEAR_INCREASE_LIMIT:
+        clearing *= ORBIT_CLEAR_INCREASE_FACTOR
+
+    return clearing
 
 # ===================================================================================================
 # ============================================ Main =================================================
@@ -431,6 +472,9 @@ def main():
     '''
     Main function for the generate_system program
     '''
+
+    # First, we should seed the random generator! This way we can get consistent results
+    np.random.seed(0)
 
     system_name = generate_system_name()
     print('System: {}'.format(system_name))
