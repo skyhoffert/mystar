@@ -29,8 +29,10 @@ PLANET_AVERAGE_ECCENTRICITY = {'Dwarf': 0.1, 'Terrestrial': 0.01, 'Gas Giant': 0
 PLANET_STDDEV_ECCENTRICITY = {'Dwarf': 0.08, 'Terrestrial': 0.008, 'Gas Giant': 0.004}
 PLANET_AVERAGE_ROTATION_PERIOD = {'Dwarf': 86400, 'Terrestrial': 86400, 'Gas Giant': 40000}
 PLANET_STDDEV_ROTATION_PERIOD = {'Dwarf': 43200, 'Terrestrial': 10000, 'Gas Giant': 10000}
-PLANET_AVERAGE_AXIAL_TILT = {'Dwarf': 5, 'Terrestrial': 12, 'Gas Giant': 12}
-PLANET_STDDEV_AXIAL_TILT = {'Dwarf': 2, 'Terrestrial': 8, 'Gas Giant': 8}
+PLANET_AVERAGE_AXIAL_TILT = {'Dwarf': 5.0, 'Terrestrial': 12.0, 'Gas Giant': 12.0}
+PLANET_STDDEV_AXIAL_TILT = {'Dwarf': 2.0, 'Terrestrial': 8.0, 'Gas Giant': 8.0}
+PLANET_AVERAGE_ALBEDO = {'Dwarf': 0.365, 'Terrestrial': 0.409, 'Gas Giant': 0.450}
+PLANET_STDDEV_ALBEDO = {'Dwarf': 0.05, 'Terrestrial': 0.05, 'Gas Giant': 0.05}
 
 PLANET_AVERAGE_INCLINATION = 0.0
 PLANET_STDDEV_INCLINATION = 3.0
@@ -38,10 +40,8 @@ PLANET_STDDEV_INCLINATION = 3.0
 PLANET_RETROGRADE_CHANCE = 0.1
 PLANET_RETROGRADE_LENGTH_INCREASE = 10.0
 
-PLANET_RINGS_TYPES = (('None', 8), ('Single', 4), ('Many', 3))
-
 PLANET_ALL_COLORS = ['gray', 'white', 'yellow', 'tan', 'blue', 'green', 'red', 'maroon', 'pink', 'orange']
 PLANET_MIN_COLORS = 1
 PLANET_MAX_COLORS = 4
 
-CONST_G = 6.674e-11
+PLANET_ORBIT_SMA_CLEARANCE_FACTOR_OF_MASS = 0.5

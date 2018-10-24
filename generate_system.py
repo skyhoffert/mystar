@@ -295,10 +295,11 @@ def generate_planet_rotation_period(planet):
 
 def generate_planet_axial_tilt(planet):
     '''
-    TODO
+    Generates an axial tilt for the given planet
+        @arg planet: dict; describes the target planet
+        @return: float; axial tilt in degrees (always positive)
     '''
 
-    # first, find the average and stddev for each type
     mean = PLANET_AVERAGE_AXIAL_TILT[planet['type']]
     stddev = PLANET_STDDEV_AXIAL_TILT[planet['type']]
 
@@ -307,13 +308,16 @@ def generate_planet_axial_tilt(planet):
     
 def generate_planet_albedo(planet):
     '''
-    TODO
+    Generates an albedo (reflectiveness) for the given planet
+        @arg planet: dict; describes the target planet
+        @return: float; albedo
     '''
 
-    # TODO
-    a = 0.367
+    mean = PLANET_AVERAGE_ALBEDO[planet['type']]
+    stddev = PLANET_STDDEV_ALBEDO[planet['type']]
 
-    return round(a, 4)
+    a = abs(np.random.normal(mean, stddev))
+    return round(a, 3)
 
 def generate_planet_surface_pressure(planet):
     '''
