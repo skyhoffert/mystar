@@ -2,7 +2,7 @@ __author__ = 'Sky Hoffert'
 __copyright__ = 'Copyright 2018, Sky Hoffert'
 __credits__ = ['Sky Hoffert']
 __license__ = 'MIT'
-__version__ = '0.0.1'
+__version__ = '0.1'
 __maintainer__ = 'Sky Hoffert'
 __email__ = 'skyhoffert@gmail.com'
 __status__ = 'Development'
@@ -13,6 +13,7 @@ import datetime
 import json
 from math import *
 import numpy as np
+import sys
 
 # ===================================================================================================
 # ============================================ Functions ============================================
@@ -50,7 +51,7 @@ def generate_star_details(s):
     star['type'] = s
     star['mass'] = generate_star_mass(s)
     star['radius'] = generate_star_radius(s, star['mass'])
-    star['surface_temp'] = generate_star_temperature(s, star['mass'], star['radius'])
+    star['surface_temperature'] = generate_star_temperature(s, star['mass'], star['radius'])
     star['parent'] = ''
     star['colors'] = generate_star_colors(star)
     star['alternate_names'] = []
@@ -84,8 +85,7 @@ def generate_planet_details(p, system):
     planet['axial_tilt'] = generate_planet_axial_tilt(planet)
     planet['albedo'] = generate_planet_albedo(planet)
     planet['surface_pressure'] = generate_planet_surface_pressure(planet)
-    planet['surface_temp_min'] = generate_planet_temp_min(planet)
-    planet['surface_temp_max'] = generate_planet_temp_max(planet)
+    planet['surface_temperature'] = generate_planet_temp(planet, system)
     planet['colors'] = generate_planet_colors(planet)
 
     planet['rings'] = []
@@ -333,33 +333,37 @@ def generate_planet_albedo(planet):
 
 def generate_planet_surface_pressure(planet):
     '''
-    TODO
+    Generates a surface pressure for the given planet
+        @arg planet: dict; describes the target planet
+        @return: float; surface pressure in kPa
     '''
 
-    # TODO
-    P = 101.325
+    mean = PLANET_AVERAGE_PRESSURE[planet['type']]
+    stddev = PLANET_STDDEV_PRESSURE[planet['type']]
 
-    return round(P, 4)
+    P = np.random.normal(mean, stddev)
+    # if negative, approach 0 as the inverse
+    if P < 0:
+        P = 1 / -P
     
-def generate_planet_temp_min(planet):
-    '''
-    TODO
-    '''
-
-    # TODO
-    T = 184
-
-    return round(T, 4)
+    return round(P, 6)
     
-def generate_planet_temp_max(planet):
+def generate_planet_temp(planet, system):
     '''
-    TODO
+    Generates a minimum surface temperature for the given planet
+        @arg planet: dict; describes the target planet
+        @return: float; minimum surface temperature in Kelvin
     '''
 
-    # TODO
-    T = 330
+    # Use the properties of the parent star
+    R_star = find_parent_star(planet, system)['radius']
+    T_star = find_parent_star(planet, system)['surface_temperature']
+    # Luminosity formula
+    L_star = 4 * pi * R_star**2 * STEFAN_BOLTZMANN_CONSTANT * T_star**4
+    # Radiative Equilibrium Temperature formula
+    T = (L_star * (1 - planet['albedo']) / (16 * pi * planet['semi_major_axis']**2 * STEFAN_BOLTZMANN_CONSTANT))**(1/4)
 
-    return round(T, 4)
+    return round(T, 1)
     
 def generate_planet_colors(planet):
     '''
@@ -483,8 +487,13 @@ def main():
     Main function for the generate_system program
     '''
 
+    # if command line parameter is given, use as the seed
+    seed = 0
+    if len(sys.argv) > 1:
+        seed = int(sys.argv[1])
+
     # First, we should seed the random generator! This way we can get consistent results
-    np.random.seed(0)
+    np.random.seed(seed)
 
     system_name = generate_system_name()
     print('System: {}'.format(system_name))
