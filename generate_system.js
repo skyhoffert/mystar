@@ -70,6 +70,13 @@ function generate_system(){
     system['date_discovered'] = new Date().toISOString().replace('-', '/').split('T')[0].replace('-', '/');
     system['planets'] = [];
 
+    // generate the planets of this system
+    let num_planets = generate_value_from_list(constants.NUM_PLANETS);
+    for (i = 0; i < num_planets; i++){
+        let type = generate_value_from_list(constants.PLANET_TYPES)
+        system['planets'].push(generate_planet_details(type, system));
+    }
+
     return system;
 }
 
@@ -196,11 +203,107 @@ function generate_star_colors(star){
     let temp = constants.STAR_COLORS[star['type']];
     
     // remove wrong colors if giant type
-    if (star['type'] == 'Main Sequence High Mass' || star['type'] == 'Giant' || star['type'] == 'Supergiant' || star['type'] == 'Hypergiant'){
+    if (star['type'] === 'Main Sequence High Mass' || star['type'] === 'Giant' || star['type'] === 'Supergiant' || star['type'] === 'Hypergiant'){
         temp = temp.splice(Math.round(random(0, 1)), 1);
     }
 
     return temp;
+}
+
+/* PLANET GENERATION ***************************************************************************************************/
+/*
+Generates a dictionary object that fully describes a new planet
+    @arg p: string; describes the type of planet
+    @arg system: dict; describes the entire system
+    @return: dict; all details about the new planet
+*/
+function generate_planet_details(p, system){
+    let planet = {};
+
+    // name is set first to a ? to indicate it is being modified
+    planet['name'] = '?';
+
+    planet['type'] = p;
+    planet['parent'] = system['stars'][Math.round(random(0,system['stars'].length-1))]['name'];
+    
+    // now that the planet has a parent, it can be named properly
+    planet['name'] = generate_planet_name(system, planet['parent'])
+    
+    planet['mass'] = round_to_sigfigs(random_bm(constants.PLANET_AVERAGE_MASSES[p], constants.PLANET_STDDEV_MASSES[p]), 4);
+    planet['radius'] = generate_planet_radius(p, planet['mass'])
+    /*
+    planet['semi_major_axis'] = generate_planet_sma(planet, system)
+    planet['eccentricity'] = generate_planet_eccentricity(planet, system)
+    planet['inclination'] = generate_planet_inclination(planet, system)
+    planet['rotation_period'] = generate_planet_rotation_period(planet)
+    planet['axial_tilt'] = generate_planet_axial_tilt(planet)
+    planet['albedo'] = generate_planet_albedo(planet)
+    planet['surface_pressure'] = generate_planet_surface_pressure(planet)
+    planet['surface_temperature'] = generate_planet_temp(planet, system)
+    planet['colors'] = generate_planet_colors(planet)
+
+    planet['rings'] = []
+    planet['moons'] = []
+    planet['alternate_names'] = []
+
+    # Moons:
+    avg = PLANET_AVERAGE_NUM_MOONS[p]
+    # use a normal curve with mean equal to average and a fitting stddev
+    num_moons = abs(floor(np.random.normal(avg,avg/2)))
+    # special case, if gas giant, add minimum number of moons!
+    if p == 'Gas Giant':
+        num_moons += PLANET_AVERAGE_NUM_MOONS[p]
+
+    # Rings:
+    # only applies to gas giants!
+    if p == 'Gas Giant':
+        # TODO: add chance for rings to gas giants
+        pass
+    */
+
+    return planet
+}
+
+/*
+Generates a planet name given the system and parent
+    @arg system: dict; describes the entire system
+    @arg parent: dict; describes the parent object
+    @return: string; name for the planet
+*/
+function generate_planet_name(system, parent){
+    // keep track of how many children the parent has
+    let num_parent_children = 0;
+    let i = 0;
+
+    // loop through all planets in the system
+    for (i = 0; i < system['planets'].length; i++){
+        // detect if this planet is the one we are naming
+        if (system['planets'][i]['name'] === '?'){
+            continue;
+        }
+
+        // otherwise, check if the parent has other children
+        if (system['planets'][i]['parent'] === parent){
+            num_parent_children += 1;
+        }
+    }
+
+    // add a lowercase letter to indicate a planet
+    return parent + String.fromCharCode('a'.charCodeAt(0) + num_parent_children);
+}
+
+/*
+Generates a planet radius, given the type of planet and mass
+    @arg p: string; indicates the type of planet
+    @arg mass: int; mass of the given planet in kg
+    @return: int; value for radius of given planet
+*/
+function generate_planet_radius(p, mass){
+    // use the difference in mass to calculate a correlated difference in radius
+    let num_stddevs_away = (mass - constants.PLANET_AVERAGE_MASSES[p]) / constants.PLANET_STDDEV_MASSES[p];
+    let radius = constants.PLANET_AVERAGE_RADII[p] + constants.PLANET_STDDEV_RADII[p] * num_stddevs_away * random_bm(1,0.1);
+
+    return Math.round(radius)
 }
 
 /* MAIN PROGRAM ********************************************************************************************************/
