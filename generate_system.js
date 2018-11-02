@@ -36,6 +36,22 @@ function random(min=0, max=1) {
 
 // actual specific generation functions ****
 
+/*
+Main function for system generation. This will use all other functions to create a system.
+    @return dict; describing the generated system
+*/
+function generate_system(){
+    // generate a system name!
+    let system_name = generate_system_name();
+
+    // generate number of Stars
+    let num_stars = generate_value_from_list(constants.NUM_STARS);
+
+    let system = {'name': system_name, 'num_stars': num_stars};
+
+    return system;
+}
+
 /* 
 Generates a new, random system name!
     @return: string; name of a new system
@@ -82,17 +98,15 @@ function DEBUG(msg){
 }
 
 /* MAIN PROGRAM ********************************************************************************************/
-// Modify the seed, if given as a command line argument
-if (process.argv[2] != null){
+ // Modify the seed, if given as a command line argument
+ if (process.argv[2] != null){
     const intval = parseInt(process.argv[2], 10)
     if (intval){
         seed = intval
     }
 }
 
-// generate a system name!
-let system_name = generate_system_name();
-console.log(system_name)
+system = generate_system();
+system_json = JSON.stringify(system);
 
-// generate number of Stars
-let num_stars = generate_value_from_list(constants.NUM_STARS);
+console.log(system_json)
