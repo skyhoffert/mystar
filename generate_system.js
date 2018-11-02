@@ -2,6 +2,7 @@
 // November 1, 2018
 
 var constants = require('./constants');
+var fs = require('fs');
 
 /* CONSTANTS ***********************************************************************************************************/
 const NUM_SAMPLES = 100;
@@ -46,13 +47,28 @@ Main function for system generation. This will use all other functions to create
     @return dict; describing the generated system
 */
 function generate_system(){
-    // generate a system name!
-    let system_name = generate_system_name();
+    // create the dict
+    let system = {};
 
-    let stars = generate_stars(system_name);
+    // generate a system name and Stars!
+    system['name'] = generate_system_name();
+    system['stars'] = generate_stars(system['name']);
+    
+    // at this point we generate an age in years
+    let longest = 13.7e9;
+    let i = 0;
 
-    // create the json object
-    let system = {'name': system_name, 'stars': stars};
+    // check every Star given for longest possible age
+    for (i = 0; i < system['stars'].length; i++){
+        longest = constants.STAR_LIFETIMES[system['stars'][i]['type']] < longest ? constants.STAR_LIFETIMES[system['stars'][i]['type']] : longest;
+    }
+
+    system['age'] = Math.round(random(0, 1) * longest);
+
+    // include some basic values in the system
+    system['discovered_by'] = 'sky';
+    system['date_discovered'] = new Date().toISOString().replace('-', '/').split('T')[0].replace('-', '/');
+    system['planets'] = [];
 
     return system;
 }
@@ -202,3 +218,6 @@ system = generate_system();
 // print it out
 system_json = JSON.stringify(system, null, 2);
 console.log(system_json);
+fs.writeFile('systems/' + system['name'] + '.json', system_json, 'utf8', function(err){
+        if (err) throw err;
+});
