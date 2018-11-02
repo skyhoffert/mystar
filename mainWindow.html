@@ -8,18 +8,24 @@
 </head>
 <body>
 <div class="split left">
-    <div class="centered">
+    <div class="centered fill">
         <!--<canvas class="main_canvas"></canvas>-->
         <img src="gfx/test_gif.gif" class="intro_gif">
     </div>
 </div>
 <div class="split right">
-    <div class="centered">
-        <form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
-            <h2>Upload a system.</h2> <br><br><br><br><br><br>
-            <input type='file' id='fileinput' class='centered'>
-            <input type='button' id='btnLoad' value='Load' onclick='loadFile();' class="black_text">
-        </form>
+    <div class="fill">
+        <div class="centered top">
+            <h1>No System.</h1>
+        </div>
+        <div class="centered">
+            <h2>Generate New System!</h2><br>
+            <button>Click Here.</button>
+        </div>
+        <!--
+        <h2>Upload a system.</h2> <br><br><br><br><br><br>
+        <input type='file' id='fileinput' class='centered'>
+        <input type='button' id='btnLoad' value='Load' onclick='loadFile();' class="black_text">
         
         <script type="text/javascript">
             function loadFile() {
@@ -52,7 +58,8 @@
                     var newArr = JSON.parse(lines); 
                 }
             }
-        </script>
+        </script> 
+        -->
     </div>
 </div>
 </body>
