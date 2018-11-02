@@ -1,0 +1,59 @@
+<!--
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <title>mystar</title>
+</head>
+<body>
+<div class="split left">
+    <div class="centered">
+        <!--<canvas class="main_canvas"></canvas>-->
+        <img src="gfx/test_gif.gif" class="intro_gif">
+    </div>
+</div>
+<div class="split right">
+    <div class="centered">
+        <form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
+            <h2>Upload a system.</h2> <br><br><br><br><br><br>
+            <input type='file' id='fileinput' class='centered'>
+            <input type='button' id='btnLoad' value='Load' onclick='loadFile();' class="black_text">
+        </form>
+        
+        <script type="text/javascript">
+            function loadFile() {
+                var input, file, fr;
+            
+                if (typeof window.FileReader !== 'function') {
+                    alert("The file API isn't supported on this browser yet.");
+                    return;
+                }
+            
+                input = document.getElementById('fileinput');
+                if (!input) {
+                    alert("Um, couldn't find the fileinput element.");
+                }
+                else if (!input.files) {
+                    alert("This browser doesn't seem to support the `files` property of file inputs.");
+                }
+                else if (!input.files[0]) {
+                    alert("Please select a file before clicking 'Load'");
+                }
+                else {
+                    file = input.files[0];
+                    fr = new FileReader();
+                    fr.onload = receivedText;
+                    fr.readAsText(file);
+                }
+            
+                function receivedText(e) {
+                    let lines = e.target.result;
+                    var newArr = JSON.parse(lines); 
+                }
+            }
+        </script>
+    </div>
+</div>
+</body>
+</html>

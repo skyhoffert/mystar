@@ -1,0 +1,22 @@
+{
+  "name": "mystar",
+  "version": "1.0.0",
+  "description": "mystar desktop application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skyhoffert/mystar.git"
+  },
+  "author": "Sky Hoffert",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/skyhoffert/mystar/issues"
+  },
+  "homepage": "https://github.com/skyhoffert/mystar#readme",
+  "dependencies": {
+    "electron": "^3.0.7"
+  }
+}
