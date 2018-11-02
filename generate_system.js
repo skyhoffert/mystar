@@ -483,3 +483,10 @@ console.log(system_json);
 fs.writeFile('systems/' + system['name'] + '.json', system_json, 'utf8', function(err){
         if (err) throw err;
 });
+
+module.exports = {
+    new_system: function(sd=(new Date().getTime())){
+        seed = sd;
+        return generate_system();
+    }
+}
