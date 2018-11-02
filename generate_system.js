@@ -3,14 +3,14 @@
 
 var constants = require('./constants');
 
-/* CONSTANTS ***********************************************************************************************/
+/* CONSTANTS ***********************************************************************************************************/
 const NUM_SAMPLES = 100
 const SEED_INIT = 1
 
-/* GLOBAL VARIABLES ****************************************************************************************/
+/* GLOBAL VARIABLES ****************************************************************************************************/
 var seed = SEED_INIT;
 
-/* FUNCTIONS ***********************************************************************************************/
+/* FUNCTIONS ***********************************************************************************************************/
 // Standard Normal variate using Box-Muller transform.
 function random_bm(mean=0.5, sigma=0.125) {
     let u = 0, v = 0;
@@ -20,8 +20,10 @@ function random_bm(mean=0.5, sigma=0.125) {
     num = num / 10.0 + 0.5; // Translate to 0 -> 1
     let diff_mean = mean - 0.5;
     let diff_stddev = sigma / 0.125
-    num += diff_mean
+    // bring value down to be around 0
+    num -= 0.5;
     num *= diff_stddev
+    num += diff_mean
     return num
 }
 // Random uniform value between 0 and 1
@@ -32,6 +34,10 @@ function random(min=0, max=1) {
     x *= range;
     x += min;
     return x;
+}
+// round a floating point value with given significant figures
+function round_to_sigfigs(val, sigfigs){
+    return Number.parseFloat(val.toPrecision(sigfigs));
 }
 
 // actual specific generation functions ****
@@ -44,25 +50,12 @@ function generate_system(){
     // generate a system name!
     let system_name = generate_system_name();
 
-    // generate number of Stars
-    let num_stars = generate_value_from_list(constants.NUM_STARS);
+    let stars = generate_stars(system_name);
 
-    let system = {'name': system_name, 'num_stars': num_stars};
+    // create the json object
+    let system = {'name': system_name, 'stars': stars};
 
     return system;
-}
-
-/* 
-Generates a new, random system name!
-    @return: string; name of a new system
-*/
-function generate_system_name(){
-    let system_name  = String(Math.floor(1000 + random(0, 9000)));
-    system_name += ' ' + String(constants.SYSTEM_NAMES[1][Math.floor(random(0, constants.SYSTEM_NAMES[1].length))]);
-    system_name += '-' + String(constants.SYSTEM_NAMES[1][Math.floor(random(0, constants.SYSTEM_NAMES[1].length))]);
-    system_name += ' ' + String(constants.SYSTEM_NAMES[0][Math.floor(random(0, constants.SYSTEM_NAMES[0].length))]);
-
-    return system_name;
 }
 
 /* 
@@ -92,12 +85,81 @@ function generate_value_from_list(list){
     return list[0][0]
 }
 
-// DEBUG
-function DEBUG(msg){
-    console.log('DEBUG: ' + msg)
+/* 
+Generates a new, random system name!
+    @return: string; name of a new system
+*/
+function generate_system_name(){
+    let system_name  = String(Math.floor(1000 + random(0, 9000)));
+    system_name += ' ' + String(constants.SYSTEM_NAMES[1][Math.floor(random(0, constants.SYSTEM_NAMES[1].length))]);
+    system_name += '-' + String(constants.SYSTEM_NAMES[1][Math.floor(random(0, constants.SYSTEM_NAMES[1].length))]);
+    system_name += ' ' + String(constants.SYSTEM_NAMES[0][Math.floor(random(0, constants.SYSTEM_NAMES[0].length))]);
+
+    return system_name;
 }
 
-/* MAIN PROGRAM ********************************************************************************************/
+/*
+Generates Stars for a given system and names them appropriately.
+    @arg name: string; name of the system
+    @return: array; of Stars
+*/
+function generate_stars(system_name){
+    // generate number of Stars
+    let num_stars = generate_value_from_list(constants.NUM_STARS);
+
+    let stars = [];
+    let star_types = [];
+    let star_letter_int = 'A'.charCodeAt(0);
+    let i = 0;
+    for (i = 0; i < num_stars; i++){
+        let star_type = generate_value_from_list(constants.STAR_TYPES);
+        let details = generate_star_details(star_type);
+        let name = system_name + ' ' + String.fromCharCode(star_letter_int);
+        details['name'] = name;
+        star_letter_int += 1;
+        stars.push(details);
+    }
+
+    return stars;
+}
+
+/*
+Generates a dictionary object that fully describes a new Star
+    @arg s: string; describes the type of Star
+    @return: dict; all details about the new Star
+*/
+function generate_star_details(s){
+    let star = {};
+
+    star['type'] = s;
+    star['mass'] = round_to_sigfigs(random_bm(constants.STAR_AVERAGE_MASSES[s], constants.STAR_STDDEV_MASSES[s]), 4);
+    star['radius'] = generate_star_radius(s, star['mass']);
+    /*
+    star['surface_temperature'] = generate_star_temperature(s, star['mass'], star['radius']);
+    star['parent'] = '';
+    star['colors'] = generate_star_colors(star);
+    star['alternate_names'] = [];
+    */
+
+    return star;
+}
+
+/* STAR GENERATION *****************************************************************************************************/
+/*
+Generates the radius of a given type of Star, depending on the Mass
+    @arg s: string; the type of Star provided
+    @arg mass: int; mass of the given Star in kg to correlate a radius to
+    @return: int; radius of given Star in meters
+*/
+function generate_star_radius(s, mass){
+    // use the difference in mass to calculate a correlated difference in radius
+    let num_stddevs_away = (mass - constants.STAR_AVERAGE_MASSES[s]) / constants.STAR_STDDEV_MASSES[s];
+    let radius = constants.STAR_AVERAGE_RADII[s]  + constants.STAR_STDDEV_RADII[s] * num_stddevs_away * random_bm(1,0.1);
+
+    return round_to_sigfigs(radius, 4);
+}
+
+/* MAIN PROGRAM ********************************************************************************************************/
  // Modify the seed, if given as a command line argument
  if (process.argv[2] != null){
     const intval = parseInt(process.argv[2], 10)
@@ -107,6 +169,6 @@ function DEBUG(msg){
 }
 
 system = generate_system();
-system_json = JSON.stringify(system);
+system_json = JSON.stringify(system, null, 2);
 
 console.log(system_json)

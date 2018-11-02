@@ -4,7 +4,7 @@ module.exports = {
 NUM_STARS: [[1,10], [2,9], [3,3], [4,1]],
 NUM_PLANETS: [[4,10], [5,10], [6,10], [7,9], [8,9], [9,9], [10,8], [11,8], [12,8], [13,7], [14,7], [15,6]],
 
-STAR_TYPES: [['Brown Dwarf',2], ['Red Dwarf', 20], ['Main Sequence Average Mass', 8], ['Main Sequence High Mass', 8], ['Giant', 4], ['Supergiant', 3], ['Hypergiant', 2], ['Neutron', 1]],
+STAR_TYPES: [['Brown Dwarf',8], ['Red Dwarf', 30], ['Main Sequence Average Mass', 8], ['Main Sequence High Mass', 8], ['Giant', 4], ['Supergiant', 3], ['Hypergiant', 2], ['Neutron', 1]],
 PLANET_TYPES: [['Gas Giant', 4], ['Terrestrial', 4], ['Dwarf', 5]],
 
 // options for possible System Names
