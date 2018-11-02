@@ -1,6 +1,17 @@
 # mystar
 Interactive program where users can create their own Star System!
 
+## TODO
+Major outstanding tasks that need to be complete are:
+ * generate_system.js - Complete implementation in javascript
+ * mystar application - Create a super simple starting point for displaying and interacting with systems.
+   * Decide on visual organization and menu interaction, including uploading old and generating new Systems
+   * Figure out how to draw things and choose a style
+   * Complete electron/node js program
+   * Think about a way to involve users more - some sort of game? Sharing potential?
+
+&nbsp;
+
 ---
 
 ## python3
@@ -26,6 +37,8 @@ The *generate_system.py* file can be seeded with a single command line integer a
 * 0 - "3732 Pi-Chi Andromeda B" A system with a good mix of planets and stars
 * 5 - "3915 Omicron-Pi Serpens A" Neutron star with 13 planets :O
 
+&nbsp;
+
 ---
 
 ## javascript
@@ -48,3 +61,10 @@ Where *<seed>* is replaced with an integer value. Some interesting seeds are lis
 ### Seeding Notes
 The *generate_system.js* file can be seeded with a single command line integer argument. Some interesting seeds are listed below if you would like to experiment with them! I cannot guarantee seeds will generate the same systems (my OS is 64-bit Windows 10), but given the random number generation, it should work!
 * 12 - "3437 Rho-Beta Scorpius" A system with 4 Stars.
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
