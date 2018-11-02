@@ -28,6 +28,11 @@ app.on('ready', function(){
         slashes: true
     }));
 
+    // quit app when closed
+    mainWindow.on('closed', function(){
+        app.quit();
+    });
+
     // remove the default menu
     Menu.setApplicationMenu(null);
 });
