@@ -282,32 +282,32 @@ function generate_planet_details(p, system){
         planet['inclination'] = round_to_sigfigs(random_bm(constants.PLANET_AVERAGE_INCLINATION, constants.PLANET_STDDEV_INCLINATION), 4);
     }
     
-    planet['rotation_period'] = generate_planet_rotation_period(planet)
+    planet['rotation_period'] = generate_planet_rotation_period(planet);
     planet['axial_tilt'] = round_to_sigfigs(random_bm(constants.PLANET_AVERAGE_AXIAL_TILT[p], constants.PLANET_STDDEV_AXIAL_TILT[p]), 4);
     planet['albedo'] = Math.abs(round_to_sigfigs(random_bm(constants.PLANET_AVERAGE_ALBEDO[p], constants.PLANET_STDDEV_ALBEDO[p]), 4));
-    planet['surface_pressure'] = generate_planet_surface_pressure(planet)
-    planet['surface_temperature'] = generate_planet_temp(planet, system)
-    /*
-    planet['colors'] = generate_planet_colors(planet)
+    planet['surface_pressure'] = generate_planet_surface_pressure(planet);
+    planet['surface_temperature'] = generate_planet_temp(planet, system);
+    planet['colors'] = generate_planet_colors(planet);
 
-    planet['rings'] = []
-    planet['moons'] = []
-    planet['alternate_names'] = []
+    planet['rings'] = [];
+    planet['moons'] = [];
+    planet['alternate_names'] = [];
+    
+    // Moons:
+    let avg = constants.PLANET_AVERAGE_NUM_MOONS[p];
+    // use a normal curve with mean equal to average and a fitting stddev
+    let num_moons = Math.abs(Math.floor(random_bm(avg,avg/2)));
+    // special case, if gas giant, add minimum number of moons!
+    if (planet['type'] === 'Gas Giant'){
+        num_moons += constants.PLANET_AVERAGE_NUM_MOONS[planet['type']];
+    }
+    // TODO - Add moons!
 
-    # Moons:
-    avg = PLANET_AVERAGE_NUM_MOONS[p]
-    # use a normal curve with mean equal to average and a fitting stddev
-    num_moons = abs(floor(np.random.normal(avg,avg/2)))
-    # special case, if gas giant, add minimum number of moons!
-    if p == 'Gas Giant':
-        num_moons += PLANET_AVERAGE_NUM_MOONS[p]
-
-    # Rings:
-    # only applies to gas giants!
-    if p == 'Gas Giant':
-        # TODO: add chance for rings to gas giants
-        pass
-    */
+    // Rings:
+    // only applies to gas giants!
+    if (planet['type'] == 'Gas Giant'){
+        // TODO: add chance for rings to gas giants
+    }
 
     return planet
 }
@@ -432,14 +432,37 @@ Generates a minimum surface temperature for the given planet
 // TODO - fix this function, temperatures are not correct
 function generate_planet_temp(planet, system){
     // Use the properties of the parent star
-    R_star = find_parent_star(planet, system)['radius']
-    T_star = find_parent_star(planet, system)['surface_temperature']
+    let R_star = find_parent_star(planet, system)['radius'];
+    let T_star = find_parent_star(planet, system)['surface_temperature'];
     // Luminosity formula
-    L_star = 4 * 3.14159 * R_star**2 * constants.STEFAN_BOLTZMANN_CONSTANT * T_star**4
+    let L_star = 4 * 3.14159 * R_star**2 * constants.STEFAN_BOLTZMANN_CONSTANT * T_star**4;
     // Radiative Equilibrium Temperature formula
-    T = (L_star * (1 - planet['albedo']) / (16 * 3.14159 * planet['semi_major_axis']**2 * constants.STEFAN_BOLTZMANN_CONSTANT))**(1/4)
+    let T = (L_star * (1 - planet['albedo']) / (16 * 3.14159 * planet['semi_major_axis']**2 * constants.STEFAN_BOLTZMANN_CONSTANT))**(1/4);
 
     return round_to_sigfigs(T, 3);
+}
+
+/*
+Generates a list of colors to associate with the given planet
+    @arg planet: dict; describes the planet
+    @return: list; colors that should be attached to the planet
+*/
+function generate_planet_colors(planet){
+    let colors = [];
+
+    // randomly (uniformly) select a number of colors
+    let num = random(constants.PLANET_MIN_COLORS, constants.PLANET_MAX_COLORS);
+
+    // iterate through as many as was chosen
+    for (let i=0; i < num; i++){
+        let color = constants.PLANET_ALL_COLORS[Math.round(random(0, constants.PLANET_ALL_COLORS.length))];
+        console.log(color);
+        if (!colors.includes(color)){
+            colors.push(color);
+        }
+    }
+
+    return colors;
 }
 
 /* MAIN PROGRAM ********************************************************************************************************/
