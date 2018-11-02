@@ -40,7 +40,7 @@ PLANET_STDDEV_PRESSURE: {'Dwarf': 0.00001, 'Terrestrial': 100.0, 'Gas Giant': 0.
 PLANET_AVERAGE_INCLINATION: 0.0,
 PLANET_STDDEV_INCLINATION: 3.0,
 
-PLANET_RETROGRADE_CHANCE: 0.1,
+PLANET_RETROGRADE_CHANCE: 0.01,
 PLANET_RETROGRADE_LENGTH_INCREASE: 10.0,
 
 PLANET_ALL_COLORS: ['gray', 'white', 'yellow', 'tan', 'blue', 'green', 'red', 'maroon', 'pink', 'orange'],

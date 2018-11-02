@@ -24,9 +24,10 @@ function random_bm(mean=0.5, sigma=0.125) {
     // bring value down to be around 0 and scale/translate
     num -= 0.5;
     num *= diff_stddev;
-    num += diff_mean;
+    num += diff_mean + 0.5;
     return num;
 }
+
 // Random uniform value between 0 and 1
 function random(min=0, max=1) {
     let x = Math.sin(seed++) * 10000;
@@ -36,6 +37,46 @@ function random(min=0, max=1) {
     x += min;
     return x;
 }
+
+/*
+Returns the dict describing the parent star of a given planet in a given system
+    @arg planet: dict; describes the target planet
+    @arg system: dict; describes the target star
+    @return: dict; describing the parent star
+*/
+function find_parent_star(planet, system){
+    // search the system for the parent
+    for (let i = 0; i < system['stars'].length; i++){
+        if (planet['parent'] == system['stars'][i]['name']){
+            return system['stars'][i];
+        }
+    }
+    
+    // if no parent is found, return None
+    return null;
+}
+
+/*
+Calculates orbital clearing given certain planet parameters
+    @arg planet: dict; describes the target planet
+    @arg system: dict; describes the target system
+    @return: float; orbital clearing distance in m
+*/
+function calculate_orbital_clearing(planet, system){
+    let a = planet['semi_major_axis'];
+    let m = planet['mass'];
+    let M = find_parent_star(planet, system)['mass'];
+
+    let r_soi = a * (m / M)**(2/5);
+    let clearing = r_soi * constants.ORBIT_CLEAR_FACTOR;
+
+    if (clearing < constants.ORBIT_CLEAR_INCREASE_LIMIT){
+        clearing *= constants.ORBIT_CLEAR_INCREASE_FACTOR;
+    }
+
+    return clearing;
+}
+
 // round a floating point value with given significant figures
 function round_to_sigfigs(val, sigfigs){
     return Number.parseFloat(val.toPrecision(sigfigs));
@@ -227,19 +268,26 @@ function generate_planet_details(p, system){
     planet['parent'] = system['stars'][Math.round(random(0,system['stars'].length-1))]['name'];
     
     // now that the planet has a parent, it can be named properly
-    planet['name'] = generate_planet_name(system, planet['parent'])
+    planet['name'] = generate_planet_name(system, planet['parent']);
     
     planet['mass'] = round_to_sigfigs(random_bm(constants.PLANET_AVERAGE_MASSES[p], constants.PLANET_STDDEV_MASSES[p]), 4);
-    planet['radius'] = generate_planet_radius(p, planet['mass'])
-    /*
-    planet['semi_major_axis'] = generate_planet_sma(planet, system)
-    planet['eccentricity'] = generate_planet_eccentricity(planet, system)
-    planet['inclination'] = generate_planet_inclination(planet, system)
+    planet['radius'] = generate_planet_radius(p, planet['mass']);
+    planet['semi_major_axis'] = generate_planet_sma(planet, system);
+    planet['eccentricity'] = Math.abs(round_to_sigfigs(random_bm(constants.PLANET_AVERAGE_ECCENTRICITY[p], constants.PLANET_STDDEV_ECCENTRICITY[p]), 4));
+
+    // the first planet in any system will have 0 inclination, the rest will have relative
+    if (planet['name'].substr(-1) == 'a'){
+        planet['inclination'] = 0.0;
+    } else {
+        planet['inclination'] = round_to_sigfigs(random_bm(constants.PLANET_AVERAGE_INCLINATION, constants.PLANET_STDDEV_INCLINATION), 4);
+    }
+    
     planet['rotation_period'] = generate_planet_rotation_period(planet)
-    planet['axial_tilt'] = generate_planet_axial_tilt(planet)
-    planet['albedo'] = generate_planet_albedo(planet)
+    planet['axial_tilt'] = round_to_sigfigs(random_bm(constants.PLANET_AVERAGE_AXIAL_TILT[p], constants.PLANET_STDDEV_AXIAL_TILT[p]), 4);
+    planet['albedo'] = Math.abs(round_to_sigfigs(random_bm(constants.PLANET_AVERAGE_ALBEDO[p], constants.PLANET_STDDEV_ALBEDO[p]), 4));
     planet['surface_pressure'] = generate_planet_surface_pressure(planet)
     planet['surface_temperature'] = generate_planet_temp(planet, system)
+    /*
     planet['colors'] = generate_planet_colors(planet)
 
     planet['rings'] = []
@@ -304,6 +352,94 @@ function generate_planet_radius(p, mass){
     let radius = constants.PLANET_AVERAGE_RADII[p] + constants.PLANET_STDDEV_RADII[p] * num_stddevs_away * random_bm(1,0.1);
 
     return Math.round(radius)
+}
+
+/*
+Generates a planet orbital radius (semi-major-axis), given the planet and system
+    @arg planet: dict; describes the given planet
+    @arg system: dict; describes the entire system
+    @return: int; orbital radius value in meters
+*/
+function generate_planet_sma(planet, system){
+    // Loop until a good sma is found
+    let passing = false;
+    let sma = 0;
+    while (!passing){
+        sma = Math.abs(random_bm(0.5,1)*constants.SEMI_MAJOR_AXIS_FACTOR + constants.SEMI_MAJOR_AXIS_OFFSET);
+        passing = true;
+        for (let i = 0; i < system['planets'].length; i++){
+            if (planet['parent'] === system['planets'][i]['parent']){
+                let this_clearance = calculate_orbital_clearing(planet, system);
+                let p_clearance = calculate_orbital_clearing(system['planets'][i], system);
+                let max_sma = system['planets'][i]['semi_major_axis'] - p_clearance - this_clearance;
+                let min_sma = system['planets'][i]['semi_major_axis'] + p_clearance + this_clearance;
+                if (sma > max_sma && sma < min_sma){
+                    passing = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    return Math.round(sma);
+}
+
+/*
+Generates a rotational period
+    @arg planet: dict; describes the target planet
+    @return: float; rotational period in seconds
+*/
+function generate_planet_rotation_period(planet){
+    // first, find the average and stddev for each type
+    let mean = constants.PLANET_AVERAGE_ROTATION_PERIOD[planet['type']];
+    let stddev = constants.PLANET_STDDEV_ROTATION_PERIOD[planet['type']];
+    let rot_per = Math.abs(random_bm(mean, stddev));
+
+    // make some planets randomly have retrograde rotation, not gas giants though
+    if (planet['type'] === 'Dwarf' || planet['type'] === 'Gas Giant'){
+        if (random(0.0, 1.0) < constants.PLANET_RETROGRADE_CHANCE){
+            // retrograde rotations probably have longer rotation rates as well
+            rot_per *= -constants.PLANET_RETROGRADE_LENGTH_INCREASE;
+        }
+    }
+
+    return Math.round(rot_per)
+}
+
+/*
+Generates a surface pressure for the given planet
+    @arg planet: dict; describes the target planet
+    @return: float; surface pressure in kPa
+*/
+function generate_planet_surface_pressure(planet){
+    let mean = constants.PLANET_AVERAGE_PRESSURE[planet['type']];
+    let stddev = constants.PLANET_STDDEV_PRESSURE[planet['type']];
+
+    let P = random_bm(mean, stddev);
+    // if negative, approach 0 as the inverse
+    if (P < 0){
+        P = 1 / -P;
+    }
+    
+    return round_to_sigfigs(P, 6);
+}
+
+/*
+Generates a minimum surface temperature for the given planet
+    @arg planet: dict; describes the target planet
+    @return: float; minimum surface temperature in Kelvin
+*/
+// TODO - fix this function, temperatures are not correct
+function generate_planet_temp(planet, system){
+    // Use the properties of the parent star
+    R_star = find_parent_star(planet, system)['radius']
+    T_star = find_parent_star(planet, system)['surface_temperature']
+    // Luminosity formula
+    L_star = 4 * 3.14159 * R_star**2 * constants.STEFAN_BOLTZMANN_CONSTANT * T_star**4
+    // Radiative Equilibrium Temperature formula
+    T = (L_star * (1 - planet['albedo']) / (16 * 3.14159 * planet['semi_major_axis']**2 * constants.STEFAN_BOLTZMANN_CONSTANT))**(1/4)
+
+    return round_to_sigfigs(T, 3);
 }
 
 /* MAIN PROGRAM ********************************************************************************************************/
