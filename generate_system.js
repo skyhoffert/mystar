@@ -456,7 +456,6 @@ function generate_planet_colors(planet){
     // iterate through as many as was chosen
     for (let i=0; i < num; i++){
         let color = constants.PLANET_ALL_COLORS[Math.round(random(0, constants.PLANET_ALL_COLORS.length))];
-        console.log(color);
         if (!colors.includes(color)){
             colors.push(color);
         }
@@ -474,15 +473,17 @@ function generate_planet_colors(planet){
     }
 }
 
+// DEBUG
+/*
 // call the generation function
 system = generate_system();
-
 // print it out
 system_json = JSON.stringify(system, null, 2);
 console.log(system_json);
 fs.writeFile('systems/' + system['name'] + '.json', system_json, 'utf8', function(err){
         if (err) throw err;
 });
+*/
 
 module.exports = {
     new_system: function(sd=(new Date().getTime())){
