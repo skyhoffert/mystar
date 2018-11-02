@@ -4,8 +4,8 @@
 var constants = require('./constants');
 
 /* CONSTANTS ***********************************************************************************************************/
-const NUM_SAMPLES = 100
-const SEED_INIT = 1
+const NUM_SAMPLES = 100;
+const SEED_INIT = 1;
 
 /* GLOBAL VARIABLES ****************************************************************************************************/
 var seed = SEED_INIT;
@@ -19,12 +19,12 @@ function random_bm(mean=0.5, sigma=0.125) {
     let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
     num = num / 10.0 + 0.5; // Translate to 0 -> 1
     let diff_mean = mean - 0.5;
-    let diff_stddev = sigma / 0.125
-    // bring value down to be around 0
+    let diff_stddev = sigma / 0.125;
+    // bring value down to be around 0 and scale/translate
     num -= 0.5;
-    num *= diff_stddev
-    num += diff_mean
-    return num
+    num *= diff_stddev;
+    num += diff_mean;
+    return num;
 }
 // Random uniform value between 0 and 1
 function random(min=0, max=1) {
@@ -41,7 +41,6 @@ function round_to_sigfigs(val, sigfigs){
 }
 
 // actual specific generation functions ****
-
 /*
 Main function for system generation. This will use all other functions to create a system.
     @return dict; describing the generated system
@@ -134,12 +133,10 @@ function generate_star_details(s){
     star['type'] = s;
     star['mass'] = round_to_sigfigs(random_bm(constants.STAR_AVERAGE_MASSES[s], constants.STAR_STDDEV_MASSES[s]), 4);
     star['radius'] = generate_star_radius(s, star['mass']);
-    /*
     star['surface_temperature'] = generate_star_temperature(s, star['mass'], star['radius']);
     star['parent'] = '';
     star['colors'] = generate_star_colors(star);
     star['alternate_names'] = [];
-    */
 
     return star;
 }
@@ -159,16 +156,49 @@ function generate_star_radius(s, mass){
     return round_to_sigfigs(radius, 4);
 }
 
+/*
+Generate the temperature of a given type of Star, depending on Mass and Radius
+    @arg s: string; the type of Star provided
+    @arg mass: int; mass of the given Star in kg
+    @arg radius: int; radius of the given Star in m
+    @return: int; temperature of given star in Kelvin
+*/
+function generate_star_temperature(s, mass, radius){
+    let num_stddevs_away = (mass - constants.STAR_AVERAGE_MASSES[s]) / constants.STAR_STDDEV_MASSES[s];
+    let temp = constants.STAR_AVERAGE_TEMPERATURE[s] + constants.STAR_STDDEV_TEMPERATURE[s] * num_stddevs_away * random_bm(1,0.1);
+
+    return Math.round(temp);
+}
+
+/*
+Generates colors of a Star, given the type
+    @arg star: dict; describes the Star
+    @return: list; of colors describing the Star
+*/
+function generate_star_colors(star){
+    // fetch the predefined possible colors
+    let temp = constants.STAR_COLORS[star['type']];
+    
+    // remove wrong colors if giant type
+    if (star['type'] == 'Main Sequence High Mass' || star['type'] == 'Giant' || star['type'] == 'Supergiant' || star['type'] == 'Hypergiant'){
+        temp = temp.splice(Math.round(random(0, 1)), 1);
+    }
+
+    return temp;
+}
+
 /* MAIN PROGRAM ********************************************************************************************************/
  // Modify the seed, if given as a command line argument
  if (process.argv[2] != null){
-    const intval = parseInt(process.argv[2], 10)
+    const intval = parseInt(process.argv[2], 10);
     if (intval){
-        seed = intval
+        seed = intval;
     }
 }
 
+// call the generation function
 system = generate_system();
-system_json = JSON.stringify(system, null, 2);
 
-console.log(system_json)
+// print it out
+system_json = JSON.stringify(system, null, 2);
+console.log(system_json);
