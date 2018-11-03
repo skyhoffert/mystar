@@ -17,7 +17,7 @@ STAR_AVERAGE_MASSES: {'Brown Dwarf': 8.75e28, 'Red Dwarf': 5.72e29, 'Main Sequen
 STAR_STDDEV_MASSES: {'Brown Dwarf': 1.5e28, 'Red Dwarf': 1.5e29, 'Main Sequence Average Mass': 1.2e29, 'Main Sequence High Mass': 8e29, 'Giant': 1.2e30, 'Supergiant': 1.5e31, 'Hypergiant': 2.0e31, 'Neutron': 1e29},
 STAR_AVERAGE_RADII: {'Brown Dwarf': 90.0e6, 'Red Dwarf': 400.0e6, 'Main Sequence Average Mass': 695.5e6, 'Main Sequence High Mass': 1.0e9, 'Giant': 20.0e9, 'Supergiant': 695.5e9, 'Hypergiant': 1.000e10, 'Neutron': 10e3},
 STAR_STDDEV_RADII: {'Brown Dwarf': 10.0e6, 'Red Dwarf': 80.0e6, 'Main Sequence Average Mass': 80.0e6, 'Main Sequence High Mass': 0.3e9, 'Giant': 2.0e9, 'Supergiant': 10.0e9, 'Hypergiant': 0.1e10, 'Neutron': 0.01e3},
-STAR_COLORS: {'Brown Dwarf': ['brown'], 'Red Dwarf': ['red'], 'Main Sequence Average Mass': ['yellow'], 'Main Sequence High Mass': ['red', 'blue'], 'Giant': ['red', 'blue'], 'Supergiant': ['red', 'blue'], 'Hypergiant': ['red', 'blue'], 'Neutron': ['white']},
+STAR_COLORS: {'Brown Dwarf': ['#8B4513'], 'Red Dwarf': ['maroon'], 'Main Sequence Average Mass': ['yellow'], 'Main Sequence High Mass': ['red', 'blue'], 'Giant': ['red', 'blue'], 'Supergiant': ['red', 'blue'], 'Hypergiant': ['red', 'blue'], 'Neutron': ['white']},
 STAR_AVERAGE_TEMPERATURE: {'Brown Dwarf': 800, 'Red Dwarf': 3100, 'Main Sequence Average Mass': 5750, 'Main Sequence High Mass': 8000, 'Giant': 12500, 'Supergiant': 20000, 'Hypergiant': 33000, 'Neutron': 600000},
 STAR_STDDEV_TEMPERATURE: {'Brown Dwarf': 200, 'Red Dwarf': 500, 'Main Sequence Average Mass': 800, 'Main Sequence High Mass': 1000, 'Giant': 3000, 'Supergiant': 4000, 'Hypergiant': 8000, 'Neutron': 60000},
 
