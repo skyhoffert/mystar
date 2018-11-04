@@ -1,6 +1,6 @@
 {
   "name": "mystar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "mystar desktop application",
   "main": "main.js",
   "scripts": {

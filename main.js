@@ -8,6 +8,7 @@ const path = require('path');
 const {app, BrowserWindow, Menu, remote} = electron;
 
 let mainWindow;
+const TOP_BAR_HEIGHT = 29;
 
 // listen for app to be ready
 app.on('ready', function(){
