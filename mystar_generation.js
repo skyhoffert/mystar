@@ -540,6 +540,7 @@ function generate_planet_colors(planet){
 
 function new_system(sd=(new Date().getTime())){
     seed = sd;
+    document.getElementById('h_seed').innerHTML = 'Seed: ' + seed;
     return generate_system();
 }
 
@@ -577,10 +578,7 @@ Draw stars for the global system variable
 function draw_stars(){
     if (system){
         if (system['stars'].length === 1){
-            ctx.beginPath();
-            ctx.fillStyle = system['stars'][0]['colors'][0];
-            ctx.arc(c.width/2, c.height/2, radius_of(system['stars'][0]), 0, 2*Math.PI);
-            ctx.fill();
+            draw_star(system['stars'][0]['colors'][0], c.width/2, c.height/2, radius_of(system['stars'][0]));
         } else if (system['stars'].length === 2){
             draw_star(system['stars'][0]['colors'][0], c.width/2-15, c.height/2-15, radius_of(system['stars'][0]));
             draw_star(system['stars'][1]['colors'][0], c.width/2+15, c.height/2+15, radius_of(system['stars'][1]));
@@ -606,11 +604,12 @@ Draw stars for the global system variable
     @return: void
 */
 function draw_star(color, x, y, r){
-    ctx.beginPath();
     ctx.fillStyle = color;
+    ctx.beginPath();
     ctx.arc(x, y, r, 0, 2*Math.PI);
     ctx.fill();
     ctx.closePath();
+    ctx.fillStyle = 'white';
 }
 
 /*
