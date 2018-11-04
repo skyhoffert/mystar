@@ -60,7 +60,7 @@ constants = {
     SEMI_MAJOR_AXIS_OFFSET: 50.0e9,
     
     SOLAR_LUMINOSITY: 3.846e26,
-    STEFAN_BOLTZMANN_CONSTANT: 5.67e-8,
+    STEFAN_BOLTZMANN_CONSTANT: 5.67e-8
 }
 
 /* *************************************************************************************************************************************************************/
@@ -553,6 +553,9 @@ var ctx = c.getContext("2d");
 // keep track of the current system
 var system = null;
 
+const SPEED_STAR = 0.2;
+const SPEED_PLANET = 0.2;
+
 // set frame rate to 30 fps
 setInterval(update, 1000/30);
 
@@ -564,7 +567,8 @@ function update(){
     // clear the screen
     ctx.clearRect(0, 0, c.width, c.height);
 
-    // draw stars near the center
+    // handle the stars
+    move_stars();
     draw_stars();
 
     // draw planets elsewhere
@@ -577,20 +581,8 @@ Draw stars for the global system variable
 */
 function draw_stars(){
     if (system){
-        if (system['stars'].length === 1){
-            draw_star(system['stars'][0]['colors'][0], c.width/2, c.height/2, radius_of(system['stars'][0]));
-        } else if (system['stars'].length === 2){
-            draw_star(system['stars'][0]['colors'][0], c.width/2-15, c.height/2-15, radius_of(system['stars'][0]));
-            draw_star(system['stars'][1]['colors'][0], c.width/2+15, c.height/2+15, radius_of(system['stars'][1]));
-        } else if (system['stars'].length === 3){
-            draw_star(system['stars'][0]['colors'][0], c.width/2-45, c.height/2+15, radius_of(system['stars'][0]));
-            draw_star(system['stars'][1]['colors'][0], c.width/2-15, c.height/2+45, radius_of(system['stars'][1]));
-            draw_star(system['stars'][2]['colors'][0], c.width/2+30, c.height/2-30, radius_of(system['stars'][2]));
-        } else if (system['stars'].length === 4){
-            draw_star(system['stars'][0]['colors'][0], c.width/2-45, c.height/2+15, radius_of(system['stars'][0]));
-            draw_star(system['stars'][1]['colors'][0], c.width/2-15, c.height/2+45, radius_of(system['stars'][1]));
-            draw_star(system['stars'][2]['colors'][0], c.width/2+15, c.height/2-45, radius_of(system['stars'][2]));
-            draw_star(system['stars'][3]['colors'][0], c.width/2+45, c.height/2-15, radius_of(system['stars'][3]));
+        for (let i = 0; i < system['stars'].length; i++){
+            draw_star(system['stars'][i]['colors'][0], system['stars'][i]['x'], system['stars'][i]['y'], radius_of(system['stars'][i]));
         }
     }
 }
@@ -610,6 +602,39 @@ function draw_star(color, x, y, r){
     ctx.fill();
     ctx.closePath();
     ctx.fillStyle = 'white';
+}
+
+function move_stars(){
+    if (system){
+        for (let i = 0; i < system['stars'].length; i++){
+            accelerate_star(system['stars'][i]);
+            system['stars'][i]['x'] += system['stars'][i]['velx'];
+            system['stars'][i]['y'] += system['stars'][i]['vely'];
+        }
+    }
+}
+
+function accelerate_star(star){
+    if (system){
+        if (system['stars'].length === 2){
+            system['stars'][0]['velx'] = -Math.sin(angle_of_star_to_CoM(system['stars'][0])) * SPEED_STAR;
+            system['stars'][0]['vely'] = Math.cos(angle_of_star_to_CoM(system['stars'][0])) * SPEED_STAR;
+            system['stars'][1]['velx'] = -Math.sin(angle_of_star_to_CoM(system['stars'][1])) * SPEED_STAR;
+            system['stars'][1]['vely'] = Math.cos(angle_of_star_to_CoM(system['stars'][1])) * SPEED_STAR;
+        }
+    }
+
+    return 0.0;
+}
+
+function angle_of_star_to_CoM(star){
+    if (system['stars'].length === 1){
+        return 0.0;
+    } else if (system['stars'].length === 2){
+        return Math.atan2(star['y'] - c.height/2.0, star['x'] - c.width/2.0);
+    }
+
+    return 0.0;
 }
 
 /*
@@ -634,7 +659,14 @@ Return a position for planet at given index. This function is temporary TODO
 */
 function planet_x_by_i(i){
     // even numbers are on the right side
-    return i % 2 === 0 ? c.width/2 + ((i/2)*25 + 200) : c.width/2 - ((i/2)*25 + 200);
+    return i % 2 === 0 ? c.width/2 + ((i)*25 + 200) : c.width/2 - ((i)*25 + 200);
+}
+
+function accelerate_planet(planet){
+    if (system){
+    }
+
+    return 0.0;
 }
 
 /*
@@ -665,6 +697,54 @@ function radius_of(star){
 function load_system(){
     system = new_system();
     document.getElementById('system_name').innerHTML = system['name'];
+    
+    if (system){
+        if (system['stars'].length === 1){
+            system['stars'][0]['x'] = c.width/2
+            system['stars'][0]['y'] = c.height/2
+            system['stars'][0]['velx'] = 0;
+            system['stars'][0]['vely'] = 0;
+        } else if (system['stars'].length === 2){
+            system['stars'][0]['x'] = c.width/2+20
+            system['stars'][0]['y'] = c.height/2
+            system['stars'][0]['velx'] = 0;
+            system['stars'][0]['vely'] = -0.2;
+            system['stars'][1]['x'] = c.width/2-20
+            system['stars'][1]['y'] = c.height/2
+            system['stars'][1]['velx'] = 0;
+            system['stars'][1]['vely'] = 0.2;
+        } else if (system['stars'].length === 3){
+            system['stars'][0]['x'] = c.width/2-45
+            system['stars'][0]['y'] = c.height/2+15
+            system['stars'][0]['velx'] = 0;
+            system['stars'][0]['vely'] = 0;
+            system['stars'][1]['x'] = c.width/2-15
+            system['stars'][1]['y'] = c.height/2+45
+            system['stars'][1]['velx'] = 0;
+            system['stars'][1]['vely'] = 0;
+            system['stars'][2]['x'] = c.width/2+30
+            system['stars'][2]['y'] = c.height/2-30
+            system['stars'][2]['velx'] = 0;
+            system['stars'][2]['vely'] = 0;
+        } else if (system['stars'].length === 4){
+            system['stars'][0]['x'] = c.width/2-45
+            system['stars'][0]['y'] = c.height/2+15
+            system['stars'][0]['velx'] = 0;
+            system['stars'][0]['vely'] = 0;
+            system['stars'][1]['x'] = c.width/2-15
+            system['stars'][1]['y'] = c.height/2+45
+            system['stars'][1]['velx'] = 0;
+            system['stars'][1]['vely'] = 0;
+            system['stars'][2]['x'] = c.width/2+15
+            system['stars'][2]['y'] = c.height/2-45
+            system['stars'][2]['velx'] = 0;
+            system['stars'][2]['vely'] = 0;
+            system['stars'][3]['x'] = c.width/2+45
+            system['stars'][3]['y'] = c.height/2-15
+            system['stars'][3]['velx'] = 0;
+            system['stars'][3]['vely'] = 0;
+        }
+    }
 }
 
 /* *************************************************************************************************************************************************************/
