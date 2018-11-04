@@ -604,6 +604,10 @@ function draw_star(color, x, y, r){
     ctx.fillStyle = 'white';
 }
 
+/*
+Move the Stars in the system by their velocity and positions
+    @return: void
+*/
 function move_stars(){
     if (system){
         for (let i = 0; i < system['stars'].length; i++){
@@ -614,6 +618,11 @@ function move_stars(){
     }
 }
 
+/*
+Changes velocities of stars in this system
+    @arg star: dict; describes the target Star
+    @return: void
+*/
 function accelerate_star(star){
     if (system){
         if (system['stars'].length === 2){
@@ -623,10 +632,13 @@ function accelerate_star(star){
             system['stars'][1]['vely'] = Math.cos(angle_of_star_to_CoM(system['stars'][1])) * SPEED_STAR;
         }
     }
-
-    return 0.0;
 }
 
+/*
+Returns the angle of a star to its center of rotation
+    @arg star: dict; describes the target star
+    @return: float; angle to the Star
+*/
 function angle_of_star_to_CoM(star){
     if (system['stars'].length === 1){
         return 0.0;
@@ -655,18 +667,12 @@ function draw_planets(){
 
 /*
 Return a position for planet at given index. This function is temporary TODO
+    @arg i: int; index of the given planet
     @return: int; position of planet on screen in pixels
 */
 function planet_x_by_i(i){
     // even numbers are on the right side
     return i % 2 === 0 ? c.width/2 + ((i)*25 + 200) : c.width/2 - ((i)*25 + 200);
-}
-
-function accelerate_planet(planet){
-    if (system){
-    }
-
-    return 0.0;
 }
 
 /*
@@ -694,6 +700,10 @@ function radius_of(star){
     }
 }
 
+/*
+Load a new system! Should be linked to an onclick event.
+    @return: void
+*/
 function load_system(){
     system = new_system();
     document.getElementById('system_name').innerHTML = system['name'];
@@ -704,12 +714,13 @@ function load_system(){
             system['stars'][0]['y'] = c.height/2
             system['stars'][0]['velx'] = 0;
             system['stars'][0]['vely'] = 0;
+            system['stars'][0]['distance_to_CoM'] = 0.0
         } else if (system['stars'].length === 2){
-            system['stars'][0]['x'] = c.width/2+20
+            system['stars'][0]['x'] = c.width/2+25
             system['stars'][0]['y'] = c.height/2
             system['stars'][0]['velx'] = 0;
             system['stars'][0]['vely'] = -0.2;
-            system['stars'][1]['x'] = c.width/2-20
+            system['stars'][1]['x'] = c.width/2-25
             system['stars'][1]['y'] = c.height/2
             system['stars'][1]['velx'] = 0;
             system['stars'][1]['vely'] = 0.2;
