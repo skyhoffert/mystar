@@ -1,8 +1,11 @@
 // Sky Hoffert
 // November 3, 2018
 
+console.log('hi');
+
 // require the generation script
-const generate_system = require('./generate_system');
+//const generate_system = require('./generate_system');
+import { new_system } from 'generate_system.js';
 
 // grab the canvas from the html document and set things for it
 var c = document.getElementById("main_canvas");
@@ -15,6 +18,15 @@ var system = null;
 
 // set frame rate to 30 fps
 setInterval(update, 1000/30);
+
+// link the button to generate a new system
+var btn = document.getElementById('btn_new_system');
+btn.onclick = function(){
+    system = new_system();
+    document.getElementById('system_name').innerHTML = system['name'];
+    console.log('hi');
+    return true;
+}
 
 // main update function
 function update(){
@@ -117,14 +129,4 @@ function radius_of(star){
     } else /* Neutron Star */ {
         return 6;
     }
-}
-
-/*
-Loads a new star system using the generate_system file into the global system variable
-    @return: void;
-*/
-function load_new_system(){
-    system = generate_system.new_system();
-
-    document.getElementById('system_name').innerHTML = system['name'];
 }
