@@ -610,8 +610,8 @@ Move the Stars in the system by their velocity and positions
 */
 function move_stars(){
     if (system){
+        accelerate_stars(system['stars'][i]);
         for (let i = 0; i < system['stars'].length; i++){
-            accelerate_star(system['stars'][i]);
             system['stars'][i]['x'] += system['stars'][i]['velx'];
             system['stars'][i]['y'] += system['stars'][i]['vely'];
         }
@@ -623,7 +623,7 @@ Changes velocities of stars in this system
     @arg star: dict; describes the target Star
     @return: void
 */
-function accelerate_star(star){
+function accelerate_stars(star){
     if (system){
         if (system['stars'].length === 2){
             system['stars'][0]['velx'] = -Math.sin(angle_of_star_to_CoM(system['stars'][0])) * SPEED_STAR;
@@ -716,42 +716,42 @@ function load_system(){
             system['stars'][0]['vely'] = 0;
             system['stars'][0]['distance_to_CoM'] = 0.0
         } else if (system['stars'].length === 2){
-            system['stars'][0]['x'] = c.width/2+25
+            system['stars'][0]['x'] = c.width/2+40
             system['stars'][0]['y'] = c.height/2
             system['stars'][0]['velx'] = 0;
-            system['stars'][0]['vely'] = -0.2;
-            system['stars'][1]['x'] = c.width/2-25
+            system['stars'][0]['vely'] = 0;
+            system['stars'][1]['x'] = c.width/2-40
             system['stars'][1]['y'] = c.height/2
             system['stars'][1]['velx'] = 0;
-            system['stars'][1]['vely'] = 0.2;
+            system['stars'][1]['vely'] = 0;
         } else if (system['stars'].length === 3){
-            system['stars'][0]['x'] = c.width/2-45
-            system['stars'][0]['y'] = c.height/2+15
+            system['stars'][0]['x'] = c.width/2-60
+            system['stars'][0]['y'] = c.height/2
             system['stars'][0]['velx'] = 0;
             system['stars'][0]['vely'] = 0;
-            system['stars'][1]['x'] = c.width/2-15
-            system['stars'][1]['y'] = c.height/2+45
+            system['stars'][1]['x'] = c.width/2-20
+            system['stars'][1]['y'] = c.height/2
             system['stars'][1]['velx'] = 0;
             system['stars'][1]['vely'] = 0;
-            system['stars'][2]['x'] = c.width/2+30
-            system['stars'][2]['y'] = c.height/2-30
+            system['stars'][2]['x'] = c.width/2+40
+            system['stars'][2]['y'] = c.height/2
             system['stars'][2]['velx'] = 0;
             system['stars'][2]['vely'] = 0;
         } else if (system['stars'].length === 4){
-            system['stars'][0]['x'] = c.width/2-45
-            system['stars'][0]['y'] = c.height/2+15
+            system['stars'][0]['x'] = c.width/2-60
+            system['stars'][0]['y'] = c.height/2
             system['stars'][0]['velx'] = 0;
             system['stars'][0]['vely'] = 0;
-            system['stars'][1]['x'] = c.width/2-15
-            system['stars'][1]['y'] = c.height/2+45
+            system['stars'][1]['x'] = c.width/2-20
+            system['stars'][1]['y'] = c.height/2
             system['stars'][1]['velx'] = 0;
             system['stars'][1]['vely'] = 0;
-            system['stars'][2]['x'] = c.width/2+15
-            system['stars'][2]['y'] = c.height/2-45
+            system['stars'][2]['x'] = c.width/2+20
+            system['stars'][2]['y'] = c.height/2
             system['stars'][2]['velx'] = 0;
             system['stars'][2]['vely'] = 0;
-            system['stars'][3]['x'] = c.width/2+45
-            system['stars'][3]['y'] = c.height/2-15
+            system['stars'][3]['x'] = c.width/2+60
+            system['stars'][3]['y'] = c.height/2
             system['stars'][3]['velx'] = 0;
             system['stars'][3]['vely'] = 0;
         }
