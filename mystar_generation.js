@@ -615,28 +615,28 @@ function move_stars(){
         let center_y = c.height/2;
         if (system['stars'].length === 1){
             system['stars'][0]['x'] = center_x;
-            system['stars'][0]['y'] = center_x;
+            system['stars'][0]['y'] = center_y;
         } else if (system['stars'].length === 2){
             system['stars'][0]['x'] = center_x + Math.sin(curtime * SPEED_STAR) * 50;
-            system['stars'][0]['y'] = center_x + Math.cos(curtime * SPEED_STAR) * 50;
+            system['stars'][0]['y'] = center_y + Math.cos(curtime * SPEED_STAR) * 50;
             system['stars'][1]['x'] = center_x - Math.sin(curtime * SPEED_STAR) * 50;
-            system['stars'][1]['y'] = center_x - Math.cos(curtime * SPEED_STAR) * 50;
+            system['stars'][1]['y'] = center_y - Math.cos(curtime * SPEED_STAR) * 50;
         } else if (system['stars'].length === 3){
             system['stars'][0]['x'] = center_x + 70*Math.sin(curtime * SPEED_STAR) + 25*Math.sin(curtime * SPEED_STAR * 4);
-            system['stars'][0]['y'] = center_x + 70*Math.cos(curtime * SPEED_STAR) + 25*Math.cos(curtime * SPEED_STAR * 4);
+            system['stars'][0]['y'] = center_y + 70*Math.cos(curtime * SPEED_STAR) + 25*Math.cos(curtime * SPEED_STAR * 4);
             system['stars'][1]['x'] = center_x + 70*Math.sin(curtime * SPEED_STAR) - 25*Math.sin(curtime * SPEED_STAR * 4);
-            system['stars'][1]['y'] = center_x + 70*Math.cos(curtime * SPEED_STAR) - 25*Math.cos(curtime * SPEED_STAR * 4);
+            system['stars'][1]['y'] = center_y + 70*Math.cos(curtime * SPEED_STAR) - 25*Math.cos(curtime * SPEED_STAR * 4);
             system['stars'][2]['x'] = center_x - 70*Math.sin(curtime * SPEED_STAR);
-            system['stars'][2]['y'] = center_x - 70*Math.cos(curtime * SPEED_STAR);
+            system['stars'][2]['y'] = center_y - 70*Math.cos(curtime * SPEED_STAR);
         } else if (system['stars'].length === 4){
             system['stars'][0]['x'] = center_x + 70*Math.sin(curtime * SPEED_STAR) + 25*Math.sin(curtime * SPEED_STAR * 4);
-            system['stars'][0]['y'] = center_x + 70*Math.cos(curtime * SPEED_STAR) + 25*Math.cos(curtime * SPEED_STAR * 4);
+            system['stars'][0]['y'] = center_y + 70*Math.cos(curtime * SPEED_STAR) + 25*Math.cos(curtime * SPEED_STAR * 4);
             system['stars'][1]['x'] = center_x + 70*Math.sin(curtime * SPEED_STAR) - 25*Math.sin(curtime * SPEED_STAR * 4);
-            system['stars'][1]['y'] = center_x + 70*Math.cos(curtime * SPEED_STAR) - 25*Math.cos(curtime * SPEED_STAR * 4);
+            system['stars'][1]['y'] = center_y + 70*Math.cos(curtime * SPEED_STAR) - 25*Math.cos(curtime * SPEED_STAR * 4);
             system['stars'][2]['x'] = center_x - 70*Math.sin(curtime * SPEED_STAR) + 25*Math.sin(curtime * SPEED_STAR * 4);
-            system['stars'][2]['y'] = center_x - 70*Math.cos(curtime * SPEED_STAR) + 25*Math.cos(curtime * SPEED_STAR * 4);
+            system['stars'][2]['y'] = center_y - 70*Math.cos(curtime * SPEED_STAR) + 25*Math.cos(curtime * SPEED_STAR * 4);
             system['stars'][3]['x'] = center_x - 70*Math.sin(curtime * SPEED_STAR) - 25*Math.sin(curtime * SPEED_STAR * 4);
-            system['stars'][3]['y'] = center_x - 70*Math.cos(curtime * SPEED_STAR) - 25*Math.cos(curtime * SPEED_STAR * 4);
+            system['stars'][3]['y'] = center_y - 70*Math.cos(curtime * SPEED_STAR) - 25*Math.cos(curtime * SPEED_STAR * 4);
         }
     }
 }
