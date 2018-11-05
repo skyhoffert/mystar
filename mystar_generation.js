@@ -622,6 +622,13 @@ function move_stars(){
             system['stars'][0]['y'] = center_y + Math.cos(curtime * SPEED_STAR) * 50;
             system['stars'][1]['x'] = center_x - Math.sin(curtime * SPEED_STAR) * 50;
             system['stars'][1]['y'] = center_y - Math.cos(curtime * SPEED_STAR) * 50;
+            
+            // draw orbital path with grayish color
+            ctx.strokeStyle = '#444444';
+            ctx.beginPath();
+            ctx.arc(c.width/2, c.height/2, 50, 0, 2*Math.PI);
+            ctx.stroke();
+            ctx.closePath();
         } else if (system['stars'].length === 3){
             system['stars'][0]['x'] = center_x + 70*Math.sin(curtime * SPEED_STAR) + 25*Math.sin(curtime * SPEED_STAR * 4);
             system['stars'][0]['y'] = center_y + 70*Math.cos(curtime * SPEED_STAR) + 25*Math.cos(curtime * SPEED_STAR * 4);
@@ -629,6 +636,18 @@ function move_stars(){
             system['stars'][1]['y'] = center_y + 70*Math.cos(curtime * SPEED_STAR) - 25*Math.cos(curtime * SPEED_STAR * 4);
             system['stars'][2]['x'] = center_x - 70*Math.sin(curtime * SPEED_STAR);
             system['stars'][2]['y'] = center_y - 70*Math.cos(curtime * SPEED_STAR);
+
+            // draw orbital path with grayish color
+            ctx.strokeStyle = '#444444';
+            ctx.beginPath();
+            ctx.arc(c.width/2, c.height/2, 70, 0, 2*Math.PI);
+            ctx.stroke();
+            ctx.closePath();
+
+            ctx.beginPath();
+            ctx.arc(c.width/2 + 70*Math.sin(curtime * SPEED_STAR), c.height/2 + 70*Math.cos(curtime * SPEED_STAR), 25, 0, 2*Math.PI);
+            ctx.stroke();
+            ctx.closePath();
         } else if (system['stars'].length === 4){
             system['stars'][0]['x'] = center_x + 70*Math.sin(curtime * SPEED_STAR) + 25*Math.sin(curtime * SPEED_STAR * 4);
             system['stars'][0]['y'] = center_y + 70*Math.cos(curtime * SPEED_STAR) + 25*Math.cos(curtime * SPEED_STAR * 4);
@@ -638,6 +657,23 @@ function move_stars(){
             system['stars'][2]['y'] = center_y - 70*Math.cos(curtime * SPEED_STAR) + 25*Math.cos(curtime * SPEED_STAR * 4);
             system['stars'][3]['x'] = center_x - 70*Math.sin(curtime * SPEED_STAR) - 25*Math.sin(curtime * SPEED_STAR * 4);
             system['stars'][3]['y'] = center_y - 70*Math.cos(curtime * SPEED_STAR) - 25*Math.cos(curtime * SPEED_STAR * 4);
+            
+            // draw orbital path with grayish color
+            ctx.strokeStyle = '#444444';
+            ctx.beginPath();
+            ctx.arc(c.width/2, c.height/2, 70, 0, 2*Math.PI);
+            ctx.stroke();
+            ctx.closePath();
+            
+            ctx.beginPath();
+            ctx.arc(c.width/2 + 70*Math.sin(curtime * SPEED_STAR), c.height/2 + 70*Math.cos(curtime * SPEED_STAR), 25, 0, 2*Math.PI);
+            ctx.stroke();
+            ctx.closePath();
+            
+            ctx.beginPath();
+            ctx.arc(c.width/2 - 70*Math.sin(curtime * SPEED_STAR), c.height/2 - 70*Math.cos(curtime * SPEED_STAR), 25, 0, 2*Math.PI);
+            ctx.stroke();
+            ctx.closePath();
         }
     }
 }
