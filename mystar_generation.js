@@ -565,7 +565,7 @@ c.addEventListener('click', function(evt) {
 
     let obj = click_near_star(mousePos.x, mousePos.y);
     if (obj != null){
-        document.getElementById('info_field').innerHTML = JSON.stringify(obj, null, 2);
+        document.getElementById('info_name').innerHTML = obj['name'];
     }
 }, false);
 
