@@ -555,17 +555,24 @@ var system = null;
 
 const SPEED_STAR = 0.0001;
 const SPEED_PLANET = 0.005;
+const CLICK_DISTANCE = 20;
+const HIGHLIGHT_RADIUS_PLANET = 1.3;
+const HIGHLIGHT_RADIUS_STAR = 1.2;
 
 // set frame rate to 30 fps
 setInterval(update, 1000/30);
 
 c.addEventListener('click', function(evt) {
     let rect = c.getBoundingClientRect();
-    let mousePos = {x: evt.clientX - rect.left, y: evt.clientY - rect.top};
+    let scaleX = c.width / rect.width;    // relationship bitmap vs. element for X
+    let scaleY = c.height / rect.height;  // relationship bitmap vs. element for Y
+    let mousePos = {x: Number.parseInt((evt.clientX - rect.left) * scaleX), y: Number.parseInt((evt.clientY - c.offsetTop) * scaleY)};
 
-    let obj = click_near_star(mousePos.x, mousePos.y);
+    let obj = click_near_object(mousePos.x, mousePos.y);
     if (obj != null){
         document.getElementById('info_name').innerHTML = obj['name'];
+    } else {
+        document.getElementById('info_name').innerHTML = '';
     }
 }, false);
 
@@ -593,23 +600,30 @@ Draw stars for the global system variable
 function draw_stars(){
     if (system){
         for (let i = 0; i < system['stars'].length; i++){
-            draw_star(system['stars'][i]['colors'][0], system['stars'][i]['x'], system['stars'][i]['y'], radius_of_star(system['stars'][i]));
+            draw_star(system['stars'][i]);
         }
     }
 }
 
 /*
 Draw stars for the global system variable
-    @arg color: string; 6-digit hex value (Ex. #AB1234) or color mapping (Ex. red) representing star color
-    @arg x: int; center of star, x
-    @arg y: int; center of star, y
-    @arg r: int; radius of star, in pixels
+    @arg star: dict; describes the target star
     @return: void
 */
-function draw_star(color, x, y, r){
-    ctx.fillStyle = color;
+function draw_star(star){
+    // optionally draw highlight
+    if (star['highlighted']){
+        // draw orbital path with grayish color
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(star['x'], star['y'], HIGHLIGHT_RADIUS_STAR*radius_of_star(star), 0, 2*Math.PI);
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    ctx.fillStyle = star['colors'][0];
     ctx.beginPath();
-    ctx.arc(x, y, r, 0, 2*Math.PI);
+    ctx.arc(star['x'], star['y'], radius_of_star(star), 0, 2*Math.PI);
     ctx.fill();
     ctx.closePath();
     ctx.fillStyle = 'white';
@@ -702,6 +716,17 @@ function draw_planets(){
             ctx.stroke();
             ctx.closePath();
 
+            // optionally draw highlight
+            if (system['planets'][i]['highlighted']){
+                let radius = HIGHLIGHT_RADIUS_PLANET*radius_of_planet(system['planets'][i]);
+                radius = radius < 4 ? 4 : radius;
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(system['planets'][i]['x'], system['planets'][i]['y'], radius, 0, 2*Math.PI);
+                ctx.fill();
+                ctx.closePath();
+            }
+
             // draw the planet
             ctx.fillStyle = system['planets'][i]['colors'][0];
             ctx.beginPath();
@@ -791,25 +816,39 @@ function load_system(){
         for (let i = 0; i < system['stars'].length; i++){
             system['stars'][i]['x'] = -100;
             system['stars'][i]['y'] = -100;
+            system['stars'][i]['highlighted'] = false;
         }
 
         for (let i = 0; i < system['planets'].length; i++){
             system['planets'][i]['x'] = planet_x_by_i(i);
             system['planets'][i]['y'] = c.height/2;
+            system['planets'][i]['highlighted'] = false;
         }
     }
+
+    document.getElementById('info_name').innerHTML = '';
 }
 
-function click_near_star(x, y){
+function click_near_object(x, y){
+    let obj = null;
     if (system){
         for (let i = 0; i < system['stars'].length; i++){
-            if (distance_to(x, y, system['stars'][i]['x'], system['stars'][i]['y']) < 25){
-                return system['stars'][i];
+            system['stars'][i]['highlighted'] = false;
+            if (!obj && distance_to(x, y, system['stars'][i]['x'], system['stars'][i]['y']) < CLICK_DISTANCE){
+                system['stars'][i]['highlighted'] = true;
+                obj = system['stars'][i];
+            }
+        }
+        for (let i = 0; i < system['planets'].length; i++){
+            system['planets'][i]['highlighted'] = false;
+            if (!obj && distance_to(x, y, system['planets'][i]['x'], system['planets'][i]['y']) < CLICK_DISTANCE){
+                system['planets'][i]['highlighted'] = true;
+                obj = system['planets'][i];
             }
         }
     }
 
-    return null;
+    return obj;
 }
 
 function distance_to(x1, y1, x2, y2){
