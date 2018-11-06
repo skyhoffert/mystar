@@ -540,7 +540,7 @@ function generate_planet_colors(planet){
 
 function new_system(sd=(new Date().getTime())){
     seed = sd;
-    document.getElementById('h_seed').innerHTML = 'Seed: ' + seed;
+    //document.getElementById('h_seed').innerHTML = 'Seed: ' + seed;
     return generate_system();
 }
 
@@ -571,8 +571,40 @@ c.addEventListener('click', function(evt) {
     let obj = click_near_object(mousePos.x, mousePos.y);
     if (obj != null){
         document.getElementById('info_name').innerHTML = obj['name'];
+        document.getElementById('info_type').innerHTML = obj['type'];
+        //document.getElementById('info_parent').innerHTML = obj['parent'];
+        document.getElementById('info_mass').innerHTML = obj['mass'].toExponential() + ' kilograms';
+        document.getElementById('info_radius').innerHTML = obj['radius'].toExponential() + ' meters';
+        document.getElementById('info_temperature').innerHTML = obj['surface_temperature'] + ' Kelvin';
+        
+        if (obj['type'] === 'Dwarf' || obj['type'] === 'Terrestrial' || obj['type'] === 'Gas Giant'){
+            document.getElementById('info_eccentricity').innerHTML = obj['eccentricity'];
+            document.getElementById('info_inclination').innerHTML = obj['inclination'] + '&deg;';
+            document.getElementById('info_rotation_period').innerHTML = obj['rotation_period'] + ' seconds';
+            document.getElementById('info_axial_tilt').innerHTML = obj['axial_tilt'] + '&deg;';
+            document.getElementById('info_albedo').innerHTML = obj['albedo'];
+            document.getElementById('info_pressure').innerHTML = obj['surface_pressure'].toExponential() + ' kPa';
+        } else {
+            document.getElementById('info_eccentricity').innerHTML = '';
+            document.getElementById('info_inclination').innerHTML = '';
+            document.getElementById('info_rotation_period').innerHTML = '';
+            document.getElementById('info_axial_tilt').innerHTML = '';
+            document.getElementById('info_albedo').innerHTML = '';
+            document.getElementById('info_pressure').innerHTML = '';
+        }
     } else {
         document.getElementById('info_name').innerHTML = '';
+        document.getElementById('info_type').innerHTML = '';
+        //document.getElementById('info_parent').innerHTML = obj['parent'];
+        document.getElementById('info_mass').innerHTML = '';
+        document.getElementById('info_radius').innerHTML = '';
+        document.getElementById('info_temperature').innerHTML = '';
+        document.getElementById('info_eccentricity').innerHTML = '';
+        document.getElementById('info_inclination').innerHTML = '';
+        document.getElementById('info_rotation_period').innerHTML = '';
+        document.getElementById('info_axial_tilt').innerHTML = '';
+        document.getElementById('info_albedo').innerHTML = '';
+        document.getElementById('info_pressure').innerHTML = '';
     }
 }, false);
 
