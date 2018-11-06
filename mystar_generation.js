@@ -559,6 +559,16 @@ const SPEED_PLANET = 0.005;
 // set frame rate to 30 fps
 setInterval(update, 1000/30);
 
+c.addEventListener('click', function(evt) {
+    let rect = c.getBoundingClientRect();
+    let mousePos = {x: evt.clientX - rect.left, y: evt.clientY - rect.top};
+
+    let obj = click_near_star(mousePos.x, mousePos.y);
+    if (obj != null){
+        document.getElementById('info_field').innerHTML = JSON.stringify(obj, null, 2);
+    }
+}, false);
+
 /*
 Main update function
     @return: void
@@ -788,6 +798,22 @@ function load_system(){
             system['planets'][i]['y'] = c.height/2;
         }
     }
+}
+
+function click_near_star(x, y){
+    if (system){
+        for (let i = 0; i < system['stars'].length; i++){
+            if (distance_to(x, y, system['stars'][i]['x'], system['stars'][i]['y']) < 25){
+                return system['stars'][i];
+            }
+        }
+    }
+
+    return null;
+}
+
+function distance_to(x1, y1, x2, y2){
+    return Math.sqrt((x2-x1)**2 + (y2-y1)**2);
 }
 
 /* *************************************************************************************************************************************************************/
