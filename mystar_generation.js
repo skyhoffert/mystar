@@ -558,13 +558,14 @@ var zoom = 1.0;
 var offset_x = 0;
 var offset_y = 0;
 var track_obj = null;
-var camera_speed = 0.05;
 
 const SPEED_STAR = 0.0001;
 const SPEED_PLANET = 0.005;
 const CLICK_DISTANCE = 20;
 const HIGHLIGHT_RADIUS_PLANET = 1.3;
 const HIGHLIGHT_RADIUS_STAR = 1.2;
+const CAMERA_SPEED = 0.1;
+const FILL_ALPHA = 0.4;
 
 // set frame rate to 30 fps
 setInterval(update, 1000/30);
@@ -574,11 +575,6 @@ c.addEventListener('click', function(evt) {
     let scaleX = c.width / rect.width;    // relationship bitmap vs. element for X
     let scaleY = c.height / rect.height;  // relationship bitmap vs. element for Y
     let mousePos = {x: Number.parseInt((evt.clientX - rect.left) * scaleX), y: Number.parseInt((evt.clientY - c.offsetTop) * scaleY)};
-
-    if (system){
-        console.log('click at ' + mousePos.x + ', ' + mousePos.y);
-        console.log('planet at ' + system['planets'][0]['x'] + ', ' + system['planets'][0]['y']);
-    }
 
     let obj = click_near_object(mousePos.x, mousePos.y);
     if (obj != null){
@@ -652,15 +648,19 @@ function update(){
     move_camera();
 }
 
+/*
+Move the camera towards the currently tracked object
+    @return: void
+*/
 function move_camera(){
     if (track_obj){
         if (Math.abs(track_obj['x'] - c.width/2) > 1 || Math.abs(track_obj['y'] - c.height/2) > 1){
-            offset_x -= (track_obj['x'] - c.width/2) * camera_speed;
-            offset_y -= (track_obj['y'] - c.height/2) * camera_speed;
+            offset_x -= (track_obj['x'] - c.width/2) * CAMERA_SPEED/zoom;
+            offset_y -= (track_obj['y'] - c.height/2) * CAMERA_SPEED/zoom;
         }
     } else {
-        offset_x = Math.abs(offset_x) > 1 ? offset_x * (1-camera_speed) : offset_x;
-        offset_y = Math.abs(offset_y) > 1 ? offset_y * (1-camera_speed) : offset_y;
+        offset_x = Math.abs(offset_x) > 1 ? offset_x * (1-CAMERA_SPEED) : offset_x;
+        offset_y = Math.abs(offset_y) > 1 ? offset_y * (1-CAMERA_SPEED) : offset_y;
     }
 }
 
@@ -701,12 +701,21 @@ function draw_star(star){
         ctx.closePath();
     }
 
-    ctx.fillStyle = star['colors'][0];
-    ctx.beginPath();
-    ctx.arc(star['x'], star['y'], radius_of_star(star) * zoom, 0, 2*Math.PI);
-    ctx.fill();
-    ctx.closePath();
-    ctx.fillStyle = 'white';
+    // draw the planet
+    let img = new Image();
+    // load image for different types
+    if (star['type'] === 'Red Dwarf'){
+        img.src = 'gfx/star_reddwarf.gif';
+    } else if (star['type'] === 'Brown Dwarf'){
+        img.src = 'gfx/star_browndwarf.gif';
+    } else if (star['type'] === 'Main Sequence Average Mass'){
+        img.src = 'gfx/star_mainsequenceaveragemass.gif';
+    } else {
+        img.src = 'gfx/star_mainsequenceaveragemass.gif';
+    }
+    // draw the image
+    let rad = radius_of_star(star)*zoom;
+    ctx.drawImage(img, star['x'] - rad, star['y'] - rad, 2*rad, 2*rad);
 }
 
 /*
@@ -818,13 +827,58 @@ function draw_planets(){
             }
 
             // draw the planet
+            let img = new Image();
+            // load image for different types
+            if (system['planets'][i]['type'] === 'Dwarf'){
+                img.src = 'gfx/planet_dwarf.gif';
+            } else if (system['planets'][i]['type'] === 'Terrestrial'){
+                img.src = 'gfx/planet_terrestrial.gif';
+            } else {
+                img.src = 'gfx/planet_gasgiant.gif';
+            }
+            // draw the image
+            let rad = radius_of_planet(system['planets'][i])*zoom;
+            ctx.drawImage(img, system['planets'][i]['x'] - rad, system['planets'][i]['y'] - rad, 2*rad, 2*rad);
+
+            // to tint, draw a circle over the planet with lower fill alpha
+            ctx.globalAlpha = FILL_ALPHA;
             ctx.fillStyle = system['planets'][i]['colors'][0];
             ctx.beginPath();
-            ctx.arc(system['planets'][i]['x'], system['planets'][i]['y'], radius_of_planet(system['planets'][i]) * zoom, 0, 2*Math.PI);
+            ctx.arc(system['planets'][i]['x'], system['planets'][i]['y'], rad, 0, 2*Math.PI);
             ctx.fill();
             ctx.closePath();
+            ctx.globalAlpha = 1.0;
         }
     }
+}
+
+function tintImage(img, tintColor) {
+    var map = img.getImageData();
+    var imdata = map.data;
+
+    // convert image to grayscale
+    var r,g,b,avg;
+    for(var p = 0, len = imdata.length; p < len; p+=4) {
+        r = imdata[p]
+        g = imdata[p+1];
+        b = imdata[p+2];
+        // alpha channel (p+3) is ignored           
+
+        avg = Math.floor((r+g+b)/3);
+
+        imdata[p] = imdata[p+1] = imdata[p+2] = avg;
+    }
+
+    ctx.putImageData(map,0,0);
+
+    // overlay filled rectangle using lighter composition
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle=tintColor;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // replace image source with canvas data
+    imgElement.src = canvas.toDataURL();
 }
 
 /*
@@ -901,6 +955,7 @@ Load a new system! Should be linked to an onclick event.
 function load_system(){
     system = new_system();
     document.getElementById('system_name').innerHTML = system['name'];
+    document.getElementById('system_name').style.color = system['stars'][0]['colors'][0];
     
     if (system){
         for (let i = 0; i < system['stars'].length; i++){
@@ -919,6 +974,12 @@ function load_system(){
     document.getElementById('info_name').innerHTML = '';
 }
 
+/*
+Check if given click coordinates are near an object and return it
+    @arg x: int; click x coordinate
+    @arg y: int; click y coordinate
+    @return: dict; describing the target object that was clicked
+*/
 function click_near_object(x, y){
     let obj = null;
     if (system){
@@ -941,6 +1002,14 @@ function click_near_object(x, y){
     return obj;
 }
 
+/*
+Find the vector distance between 2 points
+    @arg x1: int; point x1
+    @arg y1: int; point y1
+    @arg x2: int; point x2
+    @arg y2: int; point y2
+    @return: float; distance between the two points
+*/
 function distance_to(x1, y1, x2, y2){
     return Math.sqrt((x2-x1)**2 + (y2-y1)**2);
 }
