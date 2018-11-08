@@ -578,8 +578,10 @@ const HIGHLIGHT_RADIUS_STAR = 1.2;
 const CAMERA_SPEED = 0.1;
 const FILL_ALPHA = 0.4;
 
-const MAX_ZOOM = 70;
+const MAX_ZOOM = 100;
 const MIN_ZOOM = 0.025;
+
+const OBJ_SIZE_COEFFICIENT = 14 / 695.508e6;
 
 const img_background   = new Image(); img_background.src   = 'gfx/background.jpg';
 const img_planet_dwarf = new Image(); img_planet_dwarf.src = 'gfx/planet_dwarf.gif';
@@ -669,6 +671,9 @@ c.addEventListener('mouseup', function(evt) {
 }, false);
 
 c.addEventListener('mousewheel', function(evt) {
+    if (track_obj === 'home'){
+        track_obj = null;
+    }
     var delta = Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
     if (delta < 0){
         zoom = zoom > MIN_ZOOM ? zoom * 0.9 : MIN_ZOOM;
@@ -687,6 +692,11 @@ document.body.onkeyup = function(e){
         track_obj = 'home';
     // if 'n' is pressed, generate a new system
     } else if (e.keyCode === 78){
+        if (track_obj && track_obj != 'home'){
+            track_obj['highlighted'] = false;
+            clearinfo();
+        }
+        track_obj = 'home';
         load_system();
     }
 }
@@ -768,11 +778,19 @@ function move_camera(){
         if (track_obj){
             if (track_obj === 'home'){
                 // code that moves camera to center
-                offset_x = Math.abs(offset_x) > 1 ? offset_x * (1-CAMERA_SPEED) : offset_x;
-                offset_y = Math.abs(offset_y) > 1 ? offset_y * (1-CAMERA_SPEED) : offset_y;
-            } else if (Math.abs(track_obj['x'] - c.width/2) > 1 || Math.abs(track_obj['y'] - c.height/2) > 1){
-                offset_x -= (track_obj['x'] - c.width/2) * CAMERA_SPEED/zoom;
-                offset_y -= (track_obj['y'] - c.height/2) * CAMERA_SPEED/zoom;
+                offset_x = Math.abs(offset_x) > 0.1 ? offset_x * (1-CAMERA_SPEED) : 0;
+                offset_y = Math.abs(offset_y) > 0.1 ? offset_y * (1-CAMERA_SPEED) : 0;
+                if (zoom > 1.1){
+                    zoom *= (1-CAMERA_SPEED);
+                } else if (zoom < 0.9){
+                    let diff = 1/zoom;
+                    zoom *= (1+CAMERA_SPEED);
+                } else {
+                    zoom = 1.0;
+                }
+            } else if (Math.abs(track_obj['x'] - c.width/2) > 0.1 || Math.abs(track_obj['y'] - c.height/2) > 0.1){
+                offset_x -= (track_obj['x'] - c.width/2) * CAMERA_SPEED/(Math.sqrt(zoom));
+                offset_y -= (track_obj['y'] - c.height/2) * CAMERA_SPEED/(Math.sqrt(zoom));
             }
         } else {
             // code that slowly stops moving camera
@@ -1003,6 +1021,8 @@ Calculate and return radius for a given type of star
     @return: int; radius of star in pixels
 */
 function radius_of_star(star){
+    //return star['radius'] * OBJ_SIZE_COEFFICIENT;
+
     if (star['type'] == 'Brown Dwarf'){
         return 8;
     } else if (star['type'] === 'Red Dwarf'){
@@ -1028,6 +1048,8 @@ Calculate and return radius for a given type of planet
     @return: int; radius of planet in pixels
 */
 function radius_of_planet(planet){
+    //return planet['radius'] * OBJ_SIZE_COEFFICIENT;
+
     if (planet['type'] == 'Dwarf'){
         return 2;
     } else if (planet['type'] === 'Terrestrial'){
