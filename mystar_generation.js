@@ -555,7 +555,7 @@ function new_system(sd=(new Date().getTime())){
 // grab the canvas from the html document and set things for it
 var c = document.getElementById("main_canvas");
 c.width = 1280;
-c.height = 973;
+c.height = 920;
 var ctx = c.getContext("2d");
 
 // keep track of the current system
@@ -578,6 +578,9 @@ const HIGHLIGHT_RADIUS_STAR = 1.2;
 const CAMERA_SPEED = 0.1;
 const FILL_ALPHA = 0.4;
 
+const MAX_ZOOM = 70;
+const MIN_ZOOM = 0.025;
+
 const img_background   = new Image(); img_background.src   = 'gfx/background.jpg';
 const img_planet_dwarf = new Image(); img_planet_dwarf.src = 'gfx/planet_dwarf.gif';
 const img_planet_terr  = new Image(); img_planet_terr.src  = 'gfx/planet_terrestrial.gif';
@@ -590,6 +593,8 @@ const img_star_blueg   = new Image(); img_star_blueg.src   = 'gfx/star_bluegiant
 const img_star_yellow  = new Image(); img_star_yellow.src  = 'gfx/star_yellow.gif';
 
 const ORBIT_COLOR = '#222222';
+const RED_COLOR = '#FF2B32';
+const BLUE_COLOR = '#3564FF';
 
 // set frame rate to 30 fps
 setInterval(update, 1000/30);
@@ -666,20 +671,23 @@ c.addEventListener('mouseup', function(evt) {
 c.addEventListener('mousewheel', function(evt) {
     var delta = Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
     if (delta < 0){
-        zoom *= 0.9;
+        zoom = zoom > MIN_ZOOM ? zoom * 0.9 : MIN_ZOOM;
     } else {
-        zoom *= 1.1;
+        zoom = zoom < MAX_ZOOM ? zoom * 1.1 : MAX_ZOOM;
     }
 }, false);
 
 document.body.onkeyup = function(e){
-    if (e.keyCode == 32){
+    // if 'c' is pressed, center the camera
+    if (e.keyCode === 67){
         if (track_obj && track_obj != 'home'){
             track_obj['highlighted'] = false;
             clearinfo();
         }
-
         track_obj = 'home';
+    // if 'n' is pressed, generate a new system
+    } else if (e.keyCode === 78){
+        load_system();
     }
 }
 
@@ -1029,6 +1037,16 @@ function radius_of_planet(planet){
     }
 }
 
+function color_to_theme_color(color){
+    if (color === 'blue'){
+        return BLUE_COLOR;
+    } else if (color === 'red'){
+        return RED_COLOR;
+    }
+
+    return color;
+}
+
 /*
 Load a new system! Should be linked to an onclick event.
     @return: void
@@ -1036,7 +1054,7 @@ Load a new system! Should be linked to an onclick event.
 function load_system(){
     system = new_system();
     document.getElementById('system_name').innerHTML = system['name'];
-    document.getElementById('system_name').style.color = system['stars'][0]['colors'][0];
+    document.getElementById('system_name').style.color = color_to_theme_color(system['stars'][0]['colors'][0]);
     
     if (system){
         for (let i = 0; i < system['stars'].length; i++){
