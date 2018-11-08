@@ -1084,14 +1084,14 @@ function click_near_object(x, y){
     if (system){
         for (let i = 0; i < system['stars'].length; i++){
             system['stars'][i]['highlighted'] = false;
-            if (!obj && distance_to(x, y, system['stars'][i]['x'], system['stars'][i]['y']) < CLICK_DISTANCE * zoom){
+            if (!obj && distance_to(x, y, system['stars'][i]['x'], system['stars'][i]['y']) < CLICK_DISTANCE * Math.sqrt(zoom)){
                 system['stars'][i]['highlighted'] = true;
                 obj = system['stars'][i];
             }
         }
         for (let i = 0; i < system['planets'].length; i++){
             system['planets'][i]['highlighted'] = false;
-            if (!obj && distance_to(x, y, system['planets'][i]['x'], system['planets'][i]['y']) < CLICK_DISTANCE * zoom){
+            if (!obj && distance_to(x, y, system['planets'][i]['x'], system['planets'][i]['y']) < CLICK_DISTANCE * Math.sqrt(zoom)){
                 system['planets'][i]['highlighted'] = true;
                 obj = system['planets'][i];
             }
