@@ -549,6 +549,7 @@ Function that sets the seed and returns the generated system
 function new_system(sd=(new Date().getTime())){
     seed = sd;
     //document.getElementById('h_seed').innerHTML = 'Seed: ' + seed;
+
     return generate_system();
 }
 
